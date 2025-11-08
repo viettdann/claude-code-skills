@@ -1,0 +1,21 @@
+# Command Injection Patterns
+
+# Child process with template literals
+exec\(.*\$\{
+execSync\(.*\$\{
+spawn\(.*\$\{
+spawnSync\(.*\$\{
+
+# String concatenation in commands
+exec\(['"].*\+
+execSync\(['"].*\+
+
+# Shell execution
+shell:\s*true
+/bin/sh.*-c
+/bin/bash.*-c
+
+# Dangerous child_process usage
+child_process.*exec
+require\(['"]child_process
+from\s+['"]child_process

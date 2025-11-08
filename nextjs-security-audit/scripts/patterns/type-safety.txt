@@ -1,0 +1,22 @@
+# TypeScript Type Safety Issues
+
+# Any types
+:\s*any\b
+as\s+any\b
+<any>
+Array<any>
+Promise<any>
+\bany\[\]
+
+# Non-null assertions (requires context to verify)
+\!\.
+\!\[
+\!;
+
+# Type ignores
+@ts-ignore
+@ts-expect-error
+@ts-nocheck
+
+# Unsafe type assertions
+as\s+unknown\s+as

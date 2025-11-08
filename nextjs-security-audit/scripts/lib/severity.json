@@ -1,0 +1,46 @@
+{
+  "critical": {
+    "patterns": [
+      "sk_live_",
+      "sk_test_",
+      "AKIA[0-9A-Z]{16}",
+      "query.*\\$\\{.*\\}",
+      "exec\\(.*\\$\\{",
+      "password\\s*=\\s*['\"]",
+      "'use server'.*without auth"
+    ],
+    "description": "Immediate exploitation risk - fix now"
+  },
+  "high": {
+    "patterns": [
+      "dangerouslySetInnerHTML",
+      "eval\\(",
+      "new Function\\(",
+      "innerHTML\\s*=",
+      "raw\\(.*\\$\\{.*\\}",
+      "missing auth check"
+    ],
+    "description": "Significant security impact - fix today"
+  },
+  "medium": {
+    "patterns": [
+      "JSON\\.parse\\(.*req\\.",
+      "formData\\.get\\(.*without validation",
+      "as any",
+      "@ts-ignore",
+      "useEffect.*fetch",
+      "getServerSideProps"
+    ],
+    "description": "Security concern or poor practice - fix this week"
+  },
+  "low": {
+    "patterns": [
+      "\\bany\\b",
+      "console\\.log",
+      "debugger;",
+      "TODO:",
+      "FIXME:"
+    ],
+    "description": "Code quality/maintainability - backlog"
+  }
+}

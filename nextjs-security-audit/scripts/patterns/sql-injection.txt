@@ -1,0 +1,25 @@
+# SQL Injection Patterns
+# Dangerous SQL construction with user input
+
+# Template literal SQL
+query.*\$\{.*\}
+execute.*\$\{.*\}
+\$queryRaw`.*\$\{
+
+# String concatenation in SQL
+query.*\+.*params
+execute.*\+.*req\.
+sql.*\+.*searchParams
+
+# Prisma raw queries with interpolation
+raw\(.*\$\{.*\}
+\$executeRaw.*\$\{
+
+# Direct param insertion
+\.query\(['"].*\$\{
+WHERE.*\$\{
+SELECT.*\$\{
+
+# String concatenation
+query\(['"].*\+
+sql\s*=\s*['"].*\+.*['"]

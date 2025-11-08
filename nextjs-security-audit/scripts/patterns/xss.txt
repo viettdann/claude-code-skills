@@ -1,0 +1,22 @@
+# Cross-Site Scripting (XSS) Patterns
+
+# React dangerous patterns
+dangerouslySetInnerHTML
+innerHTML\s*=
+outerHTML\s*=
+
+# Code execution
+eval\(
+new\s+Function\(
+setTimeout\(['"].*\$\{
+setInterval\(['"].*\$\{
+
+# DOM manipulation with user input
+\.html\(.*params
+\.append\(.*req\.
+document\.write\(
+
+# URL-based XSS
+createObjectURL.*blob
+javascript:
+data:text/html
