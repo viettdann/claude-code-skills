@@ -1,0 +1,28 @@
+# Secret Scanner Output Files
+secret-scan-results.json
+validated-findings.json
+git-history-scan-results.json
+secret-scan-report.md
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
