@@ -1,6 +1,129 @@
 # ABP Framework Grep Pattern Reference
 
-Quick reference for detecting ABP anti-patterns and code issues.
+Quick reference for detecting ABP anti-patterns, DDD violations, and Clean Architecture issues.
+
+## Domain-Driven Design (DDD) Patterns
+
+### Entity Design
+```bash
+# Anemic domain models (entities with only getters/setters)
+rg "class.*Entity<Guid>.*\{" --type cs -A 10 | rg "public.*\{ get; set; \}" | rg -v "private set"
+
+# Public setters in Domain layer (should be private)
+rg "public.*\{ get; set; \}" --type cs -g "**/Domain/**/*.cs"
+
+# Business logic in application services (should be in domain)
+rg "if.*\.Status.*==|if.*\.State.*==" --type cs -g "**/*AppService.cs"
+
+# Direct property manipulation in app services
+rg "\.(Status|State).*=.*;" --type cs -g "**/*AppService.cs"
+```
+
+### Value Objects
+```bash
+# Mutable value objects (should be immutable)
+rg "class.*ValueObject" --type cs -A 15 | rg "public set"
+
+# Primitive obsession (using strings/ints instead of value objects)
+rg "public string (Email|Phone|Url|PostalCode|Currency)" --type cs -g "**/Domain/**/*.cs"
+
+# Missing value object validation
+rg "class.*ValueObject" --type cs -A 20 | rg -v "Check\.|throw|Validate"
+```
+
+### Aggregates
+```bash
+# Large aggregates (many includes)
+rg "Include.*Include.*Include" --type cs
+
+# Repositories for non-aggregate roots
+rg "interface I\w+Repository.*IRepository<(?!.*AggregateRoot)" --type cs
+
+# Direct child entity manipulation (bypassing aggregate root)
+rg "IRepository<\w+Item>|IRepository<\w+Line>|IRepository<\w+Detail>" --type cs
+
+# Cross-aggregate references (should reference by ID)
+rg "public.*AggregateRoot.*\{ get; set; \}" --type cs -g "**/Domain/**/*.cs"
+```
+
+### Domain Events
+```bash
+# Events published from application services (should be from entities)
+rg "PublishAsync.*new.*Eto" --type cs -g "**/*AppService.cs"
+
+# Missing domain events for state changes
+rg "Status.*=.*Confirmed|Status.*=.*Approved" --type cs | rg -v "AddDistributed|AddLocal"
+
+# Mutable event data
+rg "class.*Eto.*\{" --type cs -A 10 | rg "public.*\{ get; set; \}"
+```
+
+### Domain Services
+```bash
+# Business logic in app services (should be domain services)
+rg "class.*AppService" --type cs -A 30 | rg "if.*\(.*customer|product|order.*\)"
+
+# Domain services with infrastructure dependencies
+rg "class.*Manager.*DomainService" --type cs -A 5 | rg "IDistributedCache|HttpClient|IEmailSender"
+
+# Missing domain services for complex operations
+rg "AppService.*foreach.*Repository" --type cs
+```
+
+### Repository Pattern
+```bash
+# Repository interfaces in infrastructure layer (should be in domain)
+rg "interface I\w+Repository" --type cs -g "**/EntityFrameworkCore/**/*.cs"
+
+# Leaky abstractions (EF concepts in repository interface)
+rg "Task.*Include|IQueryable" --type cs -g "**/Domain/**/I*Repository.cs"
+
+# Generic repository used directly (should have domain-specific interface)
+rg "IRepository<\w+,.*Guid>(?!.*:)" --type cs -g "**/*AppService.cs"
+```
+
+## Clean Architecture Patterns
+
+### Dependency Rule Violations
+```bash
+# Domain depending on Infrastructure
+rg "using.*EntityFrameworkCore" --type cs -g "**/Domain/**/*.cs"
+rg "using.*HttpClient|using.*AspNetCore" --type cs -g "**/Domain/**/*.cs"
+
+# Domain depending on Application
+rg "using.*Application" --type cs -g "**/Domain/**/*.cs"
+
+# Application depending on Infrastructure/Web
+rg "using.*EntityFrameworkCore|using.*HttpApi" --type cs -g "**/Application/**/*.cs"
+
+# EF attributes in domain entities
+rg "\[Index\(|\[Table\(|\[Column\(" --type cs -g "**/Domain/**/*.cs"
+```
+
+### Layer Boundaries
+```bash
+# Entities crossing boundaries (returned from app services)
+rg "Task<\w+Entity>|Task<List<\w+Entity>>" --type cs -g "**/*AppService.cs"
+
+# Domain concepts in controllers
+rg "new.*Entity\(|new.*AggregateRoot\(" --type cs -g "**/Controllers/**/*.cs"
+
+# DbContext in wrong layers
+rg "DbContext" --type cs -g "**/Domain/**/*.cs"
+rg "DbContext" --type cs -g "**/Application/**/*.cs"
+```
+
+### Interface Adapters
+```bash
+# Missing DTOs (entities in API)
+rg "IActionResult<\w+Entity>|ActionResult<.*Entity>" --type cs
+
+# DTOs in domain layer
+rg "Dto\.cs" -g "**/Domain/**/*.cs"
+
+# Missing AutoMapper profiles
+rg "class.*AppService" --type cs | rg -v "AutoMapper|ObjectMapper"
+```
 
 ## ABP-Specific Patterns
 
@@ -271,6 +394,76 @@ rg "FromSqlRaw.*\$|ExecuteSqlRaw.*\+" --type cs
 rg "public class.*Dto" --type cs -A 5 | rg -v "Required|MaxLength"
 ```
 
+## Comprehensive Scans
+
+### Full DDD Validation Scan
+```bash
+# Scan for all DDD tactical pattern violations
+echo "=== Anemic Domain Models ==="
+rg "class.*Entity<Guid>" --type cs -g "**/Domain/**/*.cs" -A 10 | rg "public.*\{ get; set; \}" | rg -v "private set"
+
+echo "=== Value Object Violations ==="
+rg "class.*ValueObject" --type cs -A 15 | rg "public set"
+
+echo "=== Aggregate Boundary Issues ==="
+rg "IRepository<\w+(Item|Line|Detail)" --type cs
+
+echo "=== Domain Events Misplaced ==="
+rg "PublishAsync.*Eto" --type cs -g "**/*AppService.cs"
+
+echo "=== Repository Pattern Violations ==="
+rg "interface I\w+Repository" --type cs -g "**/EntityFrameworkCore/**/*.cs"
+```
+
+### Full Clean Architecture Scan
+```bash
+# Scan for all Clean Architecture violations
+echo "=== Domain Layer Dependency Violations ==="
+rg "using.*(EntityFrameworkCore|AspNetCore|Application)" --type cs -g "**/Domain/**/*.cs"
+
+echo "=== Application Layer Dependency Violations ==="
+rg "using.*(EntityFrameworkCore|HttpApi)" --type cs -g "**/Application/**/*.cs"
+
+echo "=== Entity Boundary Violations ==="
+rg "Task<\w+Entity>|ActionResult<.*Entity>" --type cs -g "**/*AppService.cs" -g "**/*Controller.cs"
+
+echo "=== Infrastructure in Domain ==="
+rg "\[Index\(|\[Table\(|DbContext" --type cs -g "**/Domain/**/*.cs"
+```
+
+### Domain Model Health Check
+```bash
+# Assess domain model richness
+echo "=== Domain Entities Count ==="
+rg "class.*: (Entity<|AggregateRoot<)" --type cs -g "**/Domain/**/*.cs" -c
+
+echo "=== Value Objects Count ==="
+rg "class.*: ValueObject" --type cs -g "**/Domain/**/*.cs" -c
+
+echo "=== Domain Services Count ==="
+rg "class.*Manager.*: DomainService" --type cs -g "**/Domain/**/*.cs" -c
+
+echo "=== Domain Events Count ==="
+rg "class.*Eto" --type cs -g "**/Domain/**/*.cs" -c
+
+echo "=== Business Logic in App Services (Should be minimal) ==="
+rg "if.*\.(Status|State|IsActive)" --type cs -g "**/*AppService.cs" -c
+```
+
+### Architecture Layer Compliance
+```bash
+# Verify layer separation
+echo "=== Domain Layer Dependencies ==="
+ls **/Domain/**/*.csproj | xargs grep "PackageReference" | grep -v "Volo.Abp"
+
+echo "=== Application Layer Dependencies ==="
+ls **/Application/**/*.csproj | xargs grep "PackageReference" | grep -v "Volo.Abp|AutoMapper"
+
+echo "=== Repository Interface Locations ==="
+rg "interface I\w+Repository" --type cs -g "**/Domain/**/*.cs" --count-matches
+rg "interface I\w+Repository" --type cs -g "**/EntityFrameworkCore/**/*.cs" --count-matches
+```
+
 ## Tips
 
 - Use `-g` to limit search to specific layers (e.g., `-g "**/*AppService.cs"`)
@@ -278,3 +471,6 @@ rg "public class.*Dto" --type cs -A 5 | rg -v "Required|MaxLength"
 - Use `-A` (after) and `-B` (before) for context
 - Pipe to `sort | uniq -c | sort -nr` to find most common issues
 - Use `--type cs` to search only C# files
+- Use `--count-matches` or `-c` for quantitative analysis
+- Combine multiple patterns with `|` for broader searches
+- Use `-g "**/Domain/**/*.cs"` to focus on specific layers
