@@ -1,7 +1,7 @@
 ---
 name: nextjs-security-audit
 description: Comprehensive security vulnerability scanner and code quality analyzer for TypeScript/Next.js codebases. Use when asked to audit, scan for security issues, check for vulnerabilities, analyze code quality, review Next.js best practices, or find dangerous patterns in React/Next.js/TypeScript projects.
-allowed-tools: Task, Grep, Glob, Read, Bash
+allowed-tools: Task, Grep, Glob, Read, Bash, Write
 ---
 
 # Next.js Security & Code Quality Auditor

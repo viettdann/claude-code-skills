@@ -1,6 +1,7 @@
 ---
 name: scanning-for-secrets
 description: Scans codebase and git history for hardcoded secrets, API keys, tokens, and credentials in Next.js/Vite, .NET/ABP, Azure services, and Docker environments. Detects Azure SQL, Storage, DevOps PATs, Service Principal secrets, Docker registry credentials, and more. Use when auditing code security, checking for exposed secrets, reviewing environment files, or before commits/deployments.
+allowed-tools: Task, Grep, Glob, Read, Bash, Write, Git
 ---
 
 # Secret Scanner Skill

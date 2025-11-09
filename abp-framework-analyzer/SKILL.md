@@ -1,7 +1,7 @@
 ---
 name: abp-framework-analyzer
 description: Comprehensive code quality analyzer and architectural auditor for ABP Framework .NET projects. Use when asked to audit, analyze, scan for issues, review code quality, check ABP best practices, find anti-patterns, identify architectural concerns, validate DDD patterns, or verify Clean Architecture compliance in ABP/.NET codebases.
-allowed-tools: Task, Grep, Glob, Read, Bash
+allowed-tools: Task, Grep, Glob, Read, Bash, Write
 ---
 
 # ABP Framework Code Analyzer
