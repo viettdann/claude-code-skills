@@ -17,6 +17,12 @@ rg "if.*\.Status.*==|if.*\.State.*==" --type cs -g "**/*AppService.cs"
 
 # Direct property manipulation in app services
 rg "\.(Status|State).*=.*;" --type cs -g "**/*AppService.cs"
+
+# Parameterless constructors in domain entities (should be protected)
+rg "public.*\(\).*\{\s*\}" --type cs -g "**/Domain/**/*Entity.cs"
+
+# Missing invariant checks in constructors
+rg "public.*Entity.*\(" --type cs -g "**/Domain/**/*.cs" -A 5 | rg -v "Check\.|Guard\.|throw"
 ```
 
 ### Value Objects
@@ -237,6 +243,69 @@ rg "\.Count\(\)\s*>\s*0" --type cs
 
 # Count in loop condition
 rg "for.*\.Count\(\)" --type cs
+
+# FirstOrDefault when Any is sufficient
+rg "\.FirstOrDefault\(\).*!=.*null" --type cs
+```
+
+### N+1 Query Problems
+```bash
+# Repository calls inside loops (N+1 problem)
+rg "foreach.*\{" --type cs -A 5 | rg "await.*Repository.*GetAsync"
+
+# LINQ Select with repository access
+rg "\.Select\(.*=>.*_.*Repository" --type cs
+
+# Multiple GetAsync in sequence
+rg "(await.*GetAsync.*\n.*){3,}" --type cs
+```
+
+### Caching Issues
+```bash
+# IMemoryCache usage (should use IDistributedCache in scaled apps)
+rg "IMemoryCache" --type cs -g "**/*AppService.cs"
+
+# ConcurrentDictionary for caching (not distributed)
+rg "ConcurrentDictionary<.*>.*cache" --type cs --ignore-case
+
+# Static cache fields (not distributed)
+rg "private static.*Cache|private static.*Dictionary" --type cs
+
+# Missing cache on frequent reads (config, settings)
+rg "GetAsync.*Configuration|GetAsync.*Setting" --type cs | rg -v "Cache"
+
+# Missing cache invalidation
+rg "UpdateAsync|InsertAsync" --type cs -A 3 | rg -v "RemoveAsync.*cache|SetAsync"
+```
+
+### Unbounded Collections
+```bash
+# GetListAsync without pagination
+rg "GetListAsync\(\)" --type cs -g "**/*AppService.cs" | rg -v "Skip|Take|Paged"
+
+# GetAll without limits
+rg "GetAll\(\)" --type cs | rg -v "Skip|Take|Top"
+
+# Missing MaxResultCount enforcement
+rg "IPagedAndSortedResultRequest" --type cs -A 10 | rg -v "Math\.Min.*MaxResultCount"
+
+# Large collection loading in API
+rg "Task<List<" --type cs -g "**/*AppService.cs" | rg -v "Paged"
+```
+
+### Magic Strings/Numbers
+```bash
+# Magic strings in authorization
+rg '\[Authorize\("' --type cs | rg -v "Permissions\."
+
+# Hardcoded error codes
+rg 'BusinessException\("' --type cs | rg -v "ErrorCodes\."
+
+# Magic numbers in business logic
+rg ">\s*\d{2,}|<\s*\d{2,}" --type cs -g "**/Domain/**/*.cs" | rg -v "const"
+
+# Configuration keys as literals
+rg '\.GetSection\("' --type cs | rg -v "Consts\.|Settings\."
 ```
 
 ### Query Issues
@@ -267,27 +336,74 @@ rg "new List<.*>\(.*\)" --type cs
 # Public methods without authorization
 rg "public async Task" --type cs -g "**/*AppService.cs" -A 1 | rg -v "\[Authorize"
 
-# Destructive operations without auth
-rg "public.*Delete|Remove|Clear" --type cs | rg -v "Authorize"
+# Destructive operations without auth (Delete, Update, Create)
+rg "public.*Task.*(Delete|Remove|Update|Create).*Async" --type cs -g "**/*AppService.cs" -B 1 | rg -v "Authorize"
+
+# Sensitive data access without auth
+rg "public.*Task.*Get.*Async" --type cs -g "**/*AppService.cs" -B 1 | rg -v "Authorize|AllowAnonymous"
+
+# Client-side authorization (relying on UI)
+rg "// UI.*hide|// Only.*admin|// Client.*check" --type cs -g "**/*AppService.cs" --ignore-case
 ```
 
 ### Input Validation
 ```bash
 # DTOs without validation attributes
-rg "public class.*Dto" --type cs -A 10 | rg -v "Required|MaxLength|Range"
+rg "public class.*Dto" --type cs -A 10 | rg -v "Required|MaxLength|Range|RegularExpression"
 
-# Missing null checks
-rg "Check\.NotNull" --type cs
+# Missing null checks in domain
+rg "public.*\(.*string" --type cs -g "**/Domain/**/*.cs" -A 3 | rg -v "Check\.|Guard\.|ArgumentNullException"
+
+# Accepting entities as input (should use DTOs)
+rg "public.*Task.*(Entity<|AggregateRoot<)" --type cs -g "**/*AppService.cs"
+
+# Missing input validation in constructors
+rg "public.*Entity.*\(" --type cs -g "**/Domain/**/*.cs" -A 5 | rg -v "Check\.|throw.*Exception"
 ```
 
 ### SQL Injection Risks
 ```bash
-# Raw SQL with interpolation
-rg "FromSqlRaw.*\$" --type cs
+# Raw SQL with string interpolation (CRITICAL)
+rg "FromSqlRaw.*\$\{|FromSqlRaw.*\$\"" --type cs
+
+# ExecuteSqlRaw with concatenation
 rg "ExecuteSqlRaw.*\+" --type cs
 
-# Dynamic SQL construction
-rg "\"SELECT.*\" \+ " --type cs
+# Dynamic SQL construction with user input
+rg "\"SELECT.*\" \+|\"UPDATE.*\" \+|\"DELETE.*\" \+" --type cs
+
+# String.Format in SQL queries
+rg "String\.Format.*SELECT|String\.Format.*UPDATE" --type cs
+```
+
+### Data Exposure
+```bash
+# Exposing entities instead of DTOs
+rg "Task<.*Entity>|Task<.*AggregateRoot>" --type cs -g "**/*AppService.cs"
+
+# Sensitive data in DTOs (passwords, secrets)
+rg "public.*Password.*\{ get; set; \}" --type cs -g "**/*Dto.cs"
+
+# API returning entities
+rg "ActionResult<.*Entity>|IActionResult.*Entity" --type cs
+
+# Missing [DisableAuditing] on sensitive operations
+rg "Password|Secret|Token" --type cs -g "**/*AppService.cs" -B 5 | rg -v "DisableAuditing"
+```
+
+### Insecure Configuration
+```bash
+# Hardcoded secrets in code
+rg "password.*=.*\"|secret.*=.*\"|key.*=.*\"" --type cs --ignore-case | rg -v "password.*input|PasswordDto"
+
+# Default JWT keys
+rg "SecurityKey.*=.*\"MySecretKey|SecurityKey.*=.*\"123" --type cs --ignore-case
+
+# Hardcoded connection strings
+rg "Server=.*Password=|User.*=.*sa.*Password" --type json
+
+# API keys in source
+rg "api_key|apikey|api-key" --type cs --type json --ignore-case | rg "=.*\"[A-Za-z0-9]"
 ```
 
 ## Exception Handling
@@ -362,18 +478,159 @@ rg "class.*MigrationsDbContext" --type cs
 rg "modelBuilder\.Entity<" --type cs -g "**/*DbContext.cs"
 ```
 
+## Observability and Debugging
+
+### Non-Structured Logging
+```bash
+# String interpolation in logging (not queryable)
+rg "_logger\.Log.*\$\{|_logger\.Log.*\$\"" --type cs
+
+# String concatenation in logging
+rg "_logger\.Log.*\+.*\+" --type cs
+
+# Missing structured placeholders
+rg "LogInformation\(\".*\{0\}.*\"|LogInformation\(string\.Format" --type cs
+
+# Correct structured logging (for reference)
+rg "LogInformation\(\".*\{[A-Za-z]" --type cs
+```
+
+### Missing Exception Mapping
+```bash
+# Generic exceptions in domain/application layer (should use BusinessException)
+rg "throw new Exception\(|throw new InvalidOperationException\(" --type cs -g "**/Domain/**/*.cs" -g "**/Application/**/*.cs"
+
+# Not using ABP's BusinessException
+rg "throw new.*Exception" --type cs -g "**/Domain/**/*.cs" | rg -v "BusinessException|UserFriendlyException"
+
+# Missing error codes
+rg "BusinessException\(\"" --type cs | rg -v "ErrorCodes\."
+
+# ArgumentException in domain (should be BusinessException)
+rg "throw new ArgumentException|throw new ArgumentNullException" --type cs -g "**/Domain/**/*.cs"
+```
+
+### Module and Configuration Issues
+```bash
+# Module dependency violations (Domain depending on Application)
+# Check .csproj files manually or use:
+find . -name "*.Domain.csproj" -exec grep -l "Application.csproj" {} \;
+
+# Repository interfaces in wrong layer (should be in Domain)
+rg "interface I\w+Repository.*:" --type cs -g "**/EntityFrameworkCore/**/*.cs"
+
+# Configuration keys not centralized (magic strings)
+rg '\.GetValue<.*>\("(?!.*:)' --type cs | sort | uniq -c | sort -rn
+
+# Configuration key duplication
+rg 'IConfiguration.*\["' --type cs -o | sort | uniq -c | sort -rn | head -20
+
+# Explicit transaction management (ABP handles automatically)
+rg "BeginTransaction\(|Commit\(|Rollback\(" --type cs -g "**/*AppService.cs"
+```
+
+## Maintainability Anti-Patterns
+
+### Over-Abstraction and YAGNI Violations
+```bash
+# Generic repositories wrapping ABP's IRepository (unnecessary)
+rg "interface.*IGenericRepository<|class.*GenericRepository<" --type cs
+
+# Interfaces with only one implementation
+rg "interface I\w+Service|interface I\w+Manager" --type cs -o | sort | uniq -c | grep "^\s*1 "
+
+# Base classes with no derived classes
+rg "public abstract class \w+Base" --type cs
+
+# Unnecessary service layers
+rg "I\w+Helper.*interface|I\w+Util.*interface" --type cs
+```
+
+### Duplicate Code Detection
+```bash
+# Repeated validation patterns
+rg "if.*string\.IsNullOrEmpty|if.*string\.IsNullOrWhiteSpace" --type cs | wc -l
+
+# Repeated authorization checks
+rg "CheckPolicyAsync|AuthorizationService\.AuthorizeAsync" --type cs -o | sort | uniq -c | sort -rn
+
+# Repeated mapping configurations
+rg "CreateMap<.*,.*>\(\)" --type cs -o | sort | uniq -c | sort -rn | head -20
+
+# Repeated null checks
+rg "if.*==.*null.*throw" --type cs | wc -l
+```
+
+### Premature Microservices Indicators
+```bash
+# Small services with few aggregates
+find . -name "*DomainModule.cs" | wc -l  # Count modules
+rg "class.*AggregateRoot<" --type cs | wc -l  # Count aggregates
+
+# Synchronous HTTP calls between services
+rg "HttpClient.*GetAsync|HttpClient.*PostAsync" --type cs -g "**/*AppService.cs"
+
+# Distributed transactions indicators
+rg "TransactionScope|DistributedTransaction" --type cs
+
+# Tight coupling between services
+rg "I\w+AppService" --type cs -g "**/*AppService.cs" | rg -v "private readonly.*= null"
+```
+
 ## Usage Examples
 
-### Scan for Critical Issues
+### Comprehensive Security Scan
 ```bash
-# All async/sync violations
+# All security issues
+echo "=== SQL Injection Risks ==="
+rg "FromSqlRaw.*\$|ExecuteSqlRaw.*\+" --type cs
+
+echo "=== Missing Authorization ==="
+rg "public async Task.*(Delete|Update|Create)" --type cs -g "**/*AppService.cs" -B 1 | rg -v "Authorize"
+
+echo "=== Insecure Configuration ==="
+rg "password.*=.*\"|Server=.*Password=" --type cs --type json --ignore-case
+
+echo "=== Data Exposure ==="
+rg "Task<.*Entity>|Task<.*AggregateRoot>" --type cs -g "**/*AppService.cs"
+```
+
+### Comprehensive Performance Scan
+```bash
+# All performance issues
+echo "=== Async/Sync Violations ==="
 rg "\.Wait\(\)|\.Result(?!\s*{)|GetAwaiter\(\)\.GetResult\(\)" --type cs
+
+echo "=== N+1 Query Problems ==="
+rg "foreach.*\{" --type cs -A 5 | rg "await.*Repository.*GetAsync"
+
+echo "=== LINQ Inefficiencies ==="
+rg "\.ToList\(\)\.(Where|Select)|\.Count\(\)\s*>\s*0" --type cs
+
+echo "=== Eager Loading Chains ==="
+rg "Include.*Include|ThenInclude" --type cs
+
+echo "=== Missing Caching ==="
+rg "GetAsync.*Configuration|GetAsync.*Setting" --type cs | rg -v "Cache"
+
+echo "=== Unbounded Collections ==="
+rg "GetListAsync\(\)" --type cs -g "**/*AppService.cs" | rg -v "Skip|Take|Paged"
+```
+
+### Scan for Critical Issues Only
+```bash
+# Critical issues that need immediate attention
+echo "=== CRITICAL: Async/Sync Violations ==="
+rg "\.Wait\(\)|\.Result(?!\s*{)|GetAwaiter\(\)\.GetResult\(\)" --type cs
+
+echo "=== CRITICAL: SQL Injection Risks ==="
+rg "FromSqlRaw.*\$\{|ExecuteSqlRaw.*\+" --type cs
+
+echo "=== CRITICAL: Missing Authorization on Delete ==="
+rg "public async Task.*Delete" --type cs -g "**/*AppService.cs" -B 1 | rg -v "Authorize"
 
 # All DbContext violations
 rg "private.*DbContext|_dbContext\.Set<" --type cs -g "**/*AppService.cs"
-
-# All missing authorization
-rg "public async Task.*Delete|Update|Create" --type cs -g "**/*AppService.cs" | rg -v "Authorize"
 ```
 
 ### Performance Scan

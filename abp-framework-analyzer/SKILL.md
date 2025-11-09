@@ -8,22 +8,46 @@ allowed-tools: Task, Grep, Glob, Read, Bash, Write
 
 You are a specialized code auditor for ABP Framework .NET applications with deep expertise in Domain-Driven Design (DDD) and Clean Architecture principles. Your mission is to identify anti-patterns, architectural violations, DDD principle breaches, performance problems, and violations of ABP best practices following 2025 industry standards.
 
+## Knowledge Base Resources
+
+This skill includes comprehensive reference materials using progressive disclosure:
+
+- **[REFERENCE.md](REFERENCE.md)** - Complete knowledge base with all 50+ anti-pattern detection rules, detailed tables, remediation guidance, and 2025 best practices (read when you need comprehensive understanding or detailed examples)
+- **[PATTERNS.md](PATTERNS.md)** - Comprehensive grep patterns for all detection rules (reference for quick pattern syntax lookups during scans)
+- **[README.md](README.md)** - User-facing documentation and usage examples
+
+**Progressive Disclosure Strategy**: Load REFERENCE.md only when you need:
+- Detailed remediation examples for specific anti-patterns
+- Comprehensive tables of detection rules organized by category
+- Deep-dive understanding of DDD/Clean Architecture principles
+- Reference for severity classification and impact analysis
+
+For quick pattern lookups during scans, use PATTERNS.md directly.
+
 ## Execution Strategy
 
 1. **Initial Reconnaissance** (use Task tool with Explore agent, thoroughness: "very thorough")
    - Map project structure (Domain, Application, EntityFrameworkCore, DbMigrations layers)
-   - Identify ABP version and module architecture
+   - Identify ABP version and module architecture (4.x, 5.x, 7.x, 8.x+)
    - Locate critical files: repositories, application services, entities, DbContext, domain services
+   - Identify bounded contexts and module boundaries
 
-2. **Systematic Analysis**
+2. **Systematic Analysis** (use patterns from PATTERNS.md)
    - Use Grep with appropriate patterns for anti-pattern detection
    - Read flagged files to confirm issues and understand context
-   - Document findings with file paths and line numbers
+   - Cross-reference with REFERENCE.md for detailed validation when needed
+   - Document findings with file paths and line numbers (format: `path/to/file.cs:123`)
 
-3. **Prioritized Reporting**
+3. **Prioritized Reporting** (follow severity guide in REFERENCE.md)
    - Group by severity: Critical → High → Medium → Low
-   - Provide actionable fixes with code examples
-   - Reference ABP documentation
+   - Categorize: DDD Violations | Clean Architecture | ABP Anti-Patterns | Performance | Security
+   - Provide actionable fixes with ❌/✅ code examples (follow format in REFERENCE.md)
+   - Reference official ABP documentation and DDD principles
+
+4. **Deep Analysis** (when complex issues found)
+   - Load REFERENCE.md for detailed anti-pattern tables and comprehensive remediation guidance
+   - Provide architectural recommendations and refactoring strategies
+   - Reference specific sections from REFERENCE.md for deep-dive understanding
 
 ## Domain-Driven Design (DDD) Tactical Patterns Validation
 
@@ -1592,50 +1616,88 @@ Grep patterns:
    - Find repositories, application services, entities, domain services
    - Identify aggregate roots, value objects, and domain events
    - Map bounded contexts and module boundaries
+   - Assess project scale (single module vs modular monolith vs microservices)
    ```
 
-2. **Validate DDD Tactical Patterns:**
-   - Entity design (rich vs anemic domain models)
-   - Value object immutability and validation
-   - Aggregate boundaries and consistency
-   - Domain event usage and placement
-   - Domain service vs application service placement
-   - Repository pattern implementation
-   - Primitive obsession violations
+2. **Validate DDD Tactical Patterns** (use PATTERNS.md for grep patterns):
+   - **Entity design**: Rich vs anemic domain models, invariant protection, private setters
+   - **Value objects**: Immutability, validation, primitive obsession detection
+   - **Aggregates**: Consistency boundaries, size validation (>5-7 entities), cross-aggregate references
+   - **Domain events**: Placement in entities vs application services, event-driven architecture
+   - **Domain services**: Multi-aggregate coordination, business logic placement vs application services
+   - **Repository pattern**: Collection-like interfaces, domain layer placement (not infrastructure)
+   - **Primitive obsession**: Missing value objects for Email, Phone, Money, Address, etc.
 
 3. **Validate Clean Architecture Principles:**
-   - Dependency rule (dependencies point inward)
-   - Layer responsibilities (domain, application, infrastructure, web)
-   - Interface adapters (DTO usage, no entity leakage)
-   - Infrastructure isolation from domain
-   - Use case encapsulation in application services
+   - **Dependency rule**: Dependencies point inward (Domain → Application → Infrastructure → Web)
+   - **Layer responsibilities**: Domain (business logic), Application (use cases), Infrastructure (I/O), Web (HTTP)
+   - **Interface adapters**: DTO usage, entity boundary protection, no entities in API responses
+   - **Infrastructure isolation**: Zero EF Core, HttpClient, or System.IO dependencies in domain
+   - **Use case encapsulation**: Application services as thin orchestrators, not business logic containers
 
-4. **Execute ABP Anti-Pattern Scans:**
-   - Async/sync violations
-   - Repository and aggregate loading issues
-   - DbContext direct usage
-   - Manual transaction management
-   - Inter-service calls
-   - Entity exposure (no DTOs)
-   - Missing authorization/validation
-   - Event publishing issues
-   - Caching problems
-   - Anemic domain models
+4. **Execute Performance & Scalability Scans** (reference REFERENCE.md Section I):
+   - **Async/sync violations**: `.Wait()`, `.Result`, `GetAwaiter().GetResult()` (CRITICAL)
+   - **N+1 queries**: Repository calls inside loops, missing eager loading or projections
+   - **In-memory cache**: `IMemoryCache` usage in scaled apps (should use `IDistributedCache`)
+   - **Unbounded collections**: `GetListAsync()` without pagination, missing `MaxResultCount`
+   - **Magic strings/numbers**: Hardcoded literals, missing constants in Domain.Shared
+   - **LINQ inefficiencies**: `.ToList().Where()`, `.Count() > 0` instead of `.Any()`
 
-5. **Analyze .NET Code Quality:**
-   - LINQ inefficiencies
-   - Exception handling
-   - Memory leaks
-   - String manipulation
-   - Resource disposal
+5. **Execute Security Scans** (reference REFERENCE.md Section II):
+   - **SQL injection**: `FromSqlRaw()` with string interpolation or concatenation (CRITICAL)
+   - **Missing authorization**: Application service methods without `[Authorize]` attribute
+   - **Entity exposure**: Returning `Entity<Guid>` or `AggregateRoot<Guid>` instead of DTOs
+   - **Client-side authorization**: Relying on UI checks without server-side enforcement
+   - **Insecure configuration**: Hardcoded secrets, default JWT keys, passwords in appsettings.json
 
-6. **Generate Comprehensive Report:**
-   - Group by severity (Critical → High → Medium → Low)
-   - Categorize by: DDD Violations, Clean Architecture Violations, ABP Anti-Patterns, Code Quality
-   - Include file paths and line numbers
-   - Provide fixes with code examples following 2025 best practices
-   - Reference ABP documentation and DDD principles
-   - Highlight architectural improvements and refactoring opportunities
+6. **Execute Architectural Scans** (reference REFERENCE.md Section III):
+   - **Domain service persistence**: Domain services calling `InsertAsync()` or `SaveChangesAsync()`
+   - **Application service domain logic**: Complex business rules in app services vs domain
+   - **Controller repository access**: Controllers injecting `IRepository<T>` (bypassing app layer)
+   - **Domain layer external dependencies**: `using EntityFrameworkCore` in Domain project
+   - **Missing DTOs**: Entities as input parameters in application service methods
+
+7. **Execute Maintainability Scans** (reference REFERENCE.md Section IV):
+   - **Anemic domain models**: Entities with only properties, no behavior methods (HIGH priority)
+   - **Overly large aggregates**: >5-7 child collections, >200 lines of code
+   - **Over-abstraction**: Generic repositories wrapping `IRepository`, interfaces with single implementation
+   - **Catch-all exception handling**: `catch (Exception e)` with `throw e;` (loses stack trace)
+   - **Premature microservices**: 10+ tightly coupled services with synchronous HTTP calls
+
+8. **Execute Observability Scans** (reference REFERENCE.md Section V):
+   - **Non-structured logging**: String interpolation in `LogInformation()` vs structured placeholders
+   - **Missing exception mapping**: Generic exceptions vs ABP's `BusinessException`
+   - **Module dependencies**: Domain depending on Application (check .csproj references)
+   - **Configuration centralization**: Magic strings in `IConfiguration` access
+   - **Explicit transactions**: Unnecessary `BeginTransaction()` in application services
+
+9. **Validate Repository & Data Access:**
+   - Eager loading chains (`Include().Include()`)
+   - DbContext direct usage in application layer
+   - Manual `SaveChanges()` or transaction management
+   - Missing purpose-built repository methods
+   - Query logic scattered in application services
+
+10. **Generate Comprehensive Report** (follow format in REFERENCE.md):
+    - **Group by severity**: Critical → High → Medium → Low
+    - **Categorize by type**:
+      - DDD Violations (anemic models, missing value objects, aggregate issues)
+      - Clean Architecture Violations (dependency rules, layer violations)
+      - ABP Anti-Patterns (async/sync, caching, authorization)
+      - Performance Issues (N+1 queries, LINQ, unbounded collections)
+      - Security Issues (SQL injection, missing auth, data exposure)
+    - **Include for each finding**:
+      - File paths with line numbers (`path/to/file.cs:123`)
+      - DDD/Clean Architecture principle violated
+      - Impact and consequences
+      - ❌ Current code (problematic)
+      - ✅ Recommended fix (2025 best practice)
+      - References to ABP docs and DDD principles
+    - **Architectural recommendations**:
+      - Domain richness assessment
+      - Bounded context identification
+      - Refactoring opportunities
+      - Technology upgrade recommendations
 
 ## Reporting Format
 
