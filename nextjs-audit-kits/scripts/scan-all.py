@@ -5,6 +5,7 @@ Next.js Comprehensive Scanner
 Runs all Next.js scans (performance, security, debug) and generates a combined report.
 """
 
+import os
 import sys
 import json
 import subprocess
@@ -12,7 +13,7 @@ from pathlib import Path
 from datetime import datetime
 from typing import Dict, List
 
-def run_scanner(script_name: str, root_dir: str) -> Dict:
+def run_scanner(script_name: str, root_dir: str, execution_dir: str) -> Dict:
     """Run a scanner script and return results"""
     script_path = Path(__file__).parent / script_name
 
@@ -25,14 +26,15 @@ def run_scanner(script_name: str, root_dir: str) -> Dict:
             [sys.executable, str(script_path), root_dir],
             capture_output=True,
             text=True,
-            timeout=300  # 5 minute timeout
+            timeout=300,  # 5 minute timeout
+            cwd=execution_dir  # Ensure subprocess runs in execution directory
         )
 
         # Print output
         print(result.stdout)
 
-        # Load JSON results
-        output_file = script_name.replace('.py', '-results.json')
+        # Load JSON results from execution directory
+        output_file = os.path.join(execution_dir, script_name.replace('.py', '-results.json'))
         with open(output_file, 'r') as f:
             return json.load(f)
 
@@ -173,6 +175,8 @@ def generate_markdown_report(report: Dict, output_file: str):
 
 def main():
     """Main execution"""
+    # Capture the original working directory where command was executed
+    execution_dir = os.getcwd()
     root_dir = sys.argv[1] if len(sys.argv) > 1 else "."
 
     print(f"\n{'='*60}")
@@ -190,7 +194,7 @@ def main():
 
     results = {}
     for scanner in scanners:
-        result = run_scanner(scanner, root_dir)
+        result = run_scanner(scanner, root_dir, execution_dir)
         results[scanner.replace('.py', '')] = result
 
     # Generate combined report
@@ -199,16 +203,16 @@ def main():
     # Print summary
     print_summary(combined_report)
 
-    # Save JSON report
-    json_output = 'nextjs-audit-report.json'
+    # Save JSON report in the execution directory
+    json_output = os.path.join(execution_dir, 'nextjs-audit-report.json')
     with open(json_output, 'w') as f:
         json.dump(combined_report, f, indent=2)
 
     print(f"\n{'='*60}")
     print(f"JSON report saved to: {json_output}")
 
-    # Generate markdown report
-    md_output = 'nextjs-audit-report.md'
+    # Generate markdown report in the execution directory
+    md_output = os.path.join(execution_dir, 'nextjs-audit-report.md')
     generate_markdown_report(combined_report, md_output)
     print(f"Markdown report saved to: {md_output}")
     print(f"{'='*60}\n")

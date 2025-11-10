@@ -395,9 +395,6 @@ python3 scripts/scan-debug.py
 # API status codes & console.log (FAST - recommended first!)
 python3 scripts/scan-api-status.py
 
-# Docker & Azure deployment scan
-python3 scripts/scan-deployment.py
-
 # Run all scans
 python3 scripts/scan-all.py
 ```

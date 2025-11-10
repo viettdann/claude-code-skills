@@ -218,6 +218,8 @@ class PerformanceScanner:
 
 def main():
     """Main execution"""
+    # Capture the original working directory where command was executed
+    original_cwd = os.getcwd()
     root_dir = sys.argv[1] if len(sys.argv) > 1 else "."
 
     scanner = PerformanceScanner(root_dir)
@@ -234,8 +236,8 @@ def main():
         if count > 0:
             print(f"  {severity}: {count}")
 
-    # Save to JSON
-    output_file = 'performance-scan-results.json'
+    # Save to JSON in the execution directory
+    output_file = os.path.join(original_cwd, 'performance-scan-results.json')
     with open(output_file, 'w') as f:
         json.dump(results, f, indent=2)
 

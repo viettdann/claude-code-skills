@@ -239,8 +239,70 @@ def generate_summary(findings: List[Dict[str, Any]]) -> Dict[str, Any]:
     }
 
 
+def convert_to_standard_format(findings: List[Dict[str, Any]]) -> Dict[str, Any]:
+    """Convert scan-api-status findings to standard scanner format."""
+    scanned_files = []
+    standard_findings = []
+    severity_map = {"HIGH": "High", "MEDIUM": "Medium", "LOW": "Low"}
+
+    for file_data in findings:
+        filepath = file_data["file"]
+        scanned_files.append(filepath)
+
+        # Convert incorrect status codes
+        for issue in file_data["incorrect_status_codes"]:
+            standard_findings.append({
+                "file": filepath,
+                "line": issue["line"],
+                "code": issue["code"],
+                "title": "Incorrect HTTP Status Code",
+                "problem": issue["reason"],
+                "fix": "Return proper 4xx or 5xx status code for errors instead of 200 OK",
+                "severity": severity_map.get(issue["severity"], "High")
+            })
+
+        # Convert missing status codes
+        for issue in file_data["missing_status_codes"]:
+            standard_findings.append({
+                "file": filepath,
+                "line": issue["line"],
+                "code": issue["code"],
+                "title": "Missing Error Status Code",
+                "problem": issue["reason"],
+                "fix": "Add proper 4xx or 5xx status code when returning errors",
+                "severity": severity_map.get(issue["severity"], "High")
+            })
+
+        # Convert console logging
+        for console in file_data["console_logging"]:
+            standard_findings.append({
+                "file": filepath,
+                "line": console["line"],
+                "code": console["code"],
+                "title": f"Console.{console['type']} in Production Code",
+                "problem": f"console.{console['type']}() should not be in production",
+                "fix": "Use proper logging library (winston, pino) or remove debug statements",
+                "severity": severity_map.get(console["severity"], "Medium")
+            })
+
+    # Calculate severity breakdown in standard format
+    severity_breakdown = {"Critical": 0, "High": 0, "Medium": 0, "Low": 0}
+    for finding in standard_findings:
+        severity_breakdown[finding["severity"]] += 1
+
+    return {
+        "scanned_files": scanned_files,
+        "total_files_scanned": len(scanned_files),
+        "total_issues": len(standard_findings),
+        "severity_breakdown": severity_breakdown,
+        "findings": standard_findings
+    }
+
+
 def main():
     """Main execution."""
+    # Capture the original working directory where command was executed
+    execution_dir = os.getcwd()
     directory = sys.argv[1] if len(sys.argv) > 1 else "."
 
     if not os.path.isdir(directory):
@@ -252,12 +314,21 @@ def main():
     findings = scan_directory(directory)
     summary = generate_summary(findings)
 
+    # Original format for stdout
     output = {
         "summary": summary,
         "findings": findings,
     }
 
-    # Output JSON
+    # Standard format for scan-all.py compatibility
+    standard_output = convert_to_standard_format(findings)
+
+    # Write standard format to JSON file in the execution directory
+    output_file = os.path.join(execution_dir, 'scan-api-status-results.json')
+    with open(output_file, 'w') as f:
+        json.dump(standard_output, f, indent=2)
+
+    # Also output JSON to stdout for compatibility
     print(json.dumps(output, indent=2))
 
     # Print summary to stderr
@@ -268,6 +339,7 @@ def main():
     print(f"  Severity: HIGH={summary['severity_breakdown']['HIGH']}, "
           f"MEDIUM={summary['severity_breakdown']['MEDIUM']}, "
           f"LOW={summary['severity_breakdown']['LOW']}", file=sys.stderr)
+    print(f"  Results saved to: {output_file}", file=sys.stderr)
 
     if summary['total_issues'] > 0:
         print(f"\n⚠️  Found {summary['total_issues']} issues requiring LLM validation", file=sys.stderr)
