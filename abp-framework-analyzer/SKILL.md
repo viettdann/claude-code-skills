@@ -1079,36 +1079,206 @@ Grep patterns:
 
 ## Reporting Format
 
-For each issue:
+**IMPORTANT**: Generate reports in a visual, scannable format with emojis and clear hierarchy, following the same style as the DDD analyzer variant.
+
+### Complete Report Structure
+
+Generate a comprehensive report with these sections:
+
+1. **# 🔍 ABP Framework Comprehensive Analysis Report** - Header with project info
+2. **## 📊 Executive Summary** - Overall assessment + Quick Stats table
+3. **## Table of Contents** - Links to all sections
+4. **## 🚨 CRITICAL ISSUES (X)** - Numbered issues with emojis, fix time, testing sections
+5. **## 🔴 HIGH SEVERITY ISSUES (X)** - Same detailed format
+6. **## ⚠️ MEDIUM SEVERITY ISSUES (X)** - Can be more concise
+7. **## ✅ STRENGTHS & BEST PRACTICES** - Highlight what's done well (important!)
+8. **## 📋 Summary & Priority Roadmap** - Issue tables, quality scores, priorities
+9. **## 🎯 RECOMMENDED IMMEDIATE ACTIONS** - Phase-by-phase implementation
+10. **## 📚 REFERENCES & RESOURCES** - Categorized docs
+11. **## 🎬 CONCLUSION** - Verdict, strengths, gaps, next steps
+
+### Individual Issue Format
 
 ```markdown
-### [SEVERITY] Issue Title
+### 🚨 CRITICAL #1: [Issue Title]
 
 **Location:** `path/to/file.cs:123`
 
-**Category:** [Clean Architecture Violation | ABP Anti-Pattern | Performance | Security | Architecture | Maintainability]
+**Severity:** CRITICAL
+**Category:** [Clean Architecture | ABP Anti-Pattern | Security | Performance]
+**Estimated Fix Time:** X minutes
 
-**Clean Architecture Principle:**
-[Which principle or pattern is violated, if applicable]
+#### Problem
 
-**Problem:**
-[Specific description of the issue]
+[Clear description]
 
-**Impact:**
-[Consequences if not fixed - technical debt, maintainability, performance, security]
+#### Impact
 
-**Fix:**
+- [Impact points with consequences]
+- [Business/technical impacts]
+
+#### Current Code (Problematic)
+
 ```csharp
-// ❌ Current (problematic)
-[current code]
-
-// ✅ Recommended (2025 best practice)
-[fixed code with explanation following Clean Architecture principles]
+// ❌ [Description of problem]
+[problematic code]
 ```
 
-**References:**
-- [Link to relevant ABP docs]
-- [Clean Architecture principle reference]
+#### Recommended Fix
+
+**Step 1: [Action]**
+
+```csharp
+// ✅ Correct: [Description]
+[fixed code]
+```
+
+**Step 2: [Second Action]** (if multi-step)
+
+```csharp
+// ✅ [Description]
+[more code]
+```
+
+#### Testing
+
+```bash
+# Test that fix works
+[test command]
+# Expected: [expected result]
+
+# Test edge case
+[command]
+# Expected: [output]
+```
+
+#### References
+
+- [ABP Documentation](url)
+- [Clean Architecture Principle](url)
+- [OWASP or standard](url)
+```
+
+### Strengths Section Format
+
+```markdown
+## ✅ STRENGTHS & BEST PRACTICES
+
+Your codebase demonstrates **[assessment]** in many areas. Here are the highlights:
+
+### ✅ #1: [Strength Title]
+
+**Finding:** [What was found that's good]
+
+**Evidence:**
+```
+✅ [Evidence point]
+✅ [Evidence point]
+✅ [Evidence point]
+```
+
+**What This Means:**
+- [Positive impact]
+- [Why this matters]
+
+**Example from Codebase:**
+
+```csharp
+// ✅ Excellent: [Description]
+[good code example]
+```
+
+**Why This is Excellent:**
+- ✅ [Reason]
+- ✅ [Reason]
+- ✅ [Reason]
+```
+
+### Summary & Roadmap Format
+
+```markdown
+## 📋 Summary & Priority Roadmap
+
+### Issue Distribution by Severity
+
+| Severity | Count | Must Fix Before Production? |
+|----------|-------|----------------------------|
+| 🚨 **CRITICAL** | X | ✅ **YES - BLOCKERS** |
+| 🔴 **HIGH** | X | ✅ **YES - RECOMMENDED** |
+| ⚠️ **MEDIUM** | X | ⚠️ **RECOMMENDED** |
+| ℹ️ **LOW** | X | 🟢 **NICE TO HAVE** |
+| ✅ **STRENGTHS** | X+ | 🎉 **EXCELLENT** |
+
+### Overall Code Quality Score
+
+**Architecture:** [Grade] ([Rating])
+**Security:** [Grade] ([Rating])
+**Performance:** [Grade] ([Rating])
+**Maintainability:** [Grade] ([Rating])
+**Best Practices:** [Grade] ([Rating])
+
+**Overall:** **[Grade] ([Rating])**
+
+### Priority Fix Order
+
+#### 🚨 IMMEDIATE (Pre-Production Blockers)
+
+| # | Issue | File | Time | Priority |
+|---|-------|------|------|----------|
+| 1 | [Issue] | [File] | X min | **P0** |
+
+**Total Time: ~X hours**
+```
+
+### Conclusion Format
+
+```markdown
+## 🎬 CONCLUSION
+
+### Final Verdict
+
+**Code Quality Grade: [Grade] ([Rating])**
+
+---
+
+### What's Exceptional ✅
+
+1. **[Strength]** - [Description]
+2. **[Strength]** - [Description]
+
+---
+
+### Critical Gaps ❌
+
+1. **[Issue]** - [Description]
+2. **[Issue]** - [Description]
+
+---
+
+### Bottom Line
+
+**[Production readiness statement]**
+
+[Assessment paragraph]
+
+**Estimated Fix Time:** X-X hours total
+- [Category]: X hour
+- [Category]: X hour
+
+[Recommendation]
+
+---
+
+### Next Steps
+
+1. ✅ **[Action]** - [Details] (X hour)
+2. ✅ **[Action]** - [Details]
+
+---
+
+**Report Generated:** YYYY-MM-DD
+**Analyzer:** ABP Framework Analyzer Skill
+**Project:** [Name] (ABP X.X.X, .NET X.X)
 ```
 
 ## Severity Classification

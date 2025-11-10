@@ -1701,37 +1701,413 @@ Grep patterns:
 
 ## Reporting Format
 
-For each issue:
+**IMPORTANT**: Generate reports in a visual, scannable format with emojis and clear hierarchy, following the structure below:
+
+### Report Header
 
 ```markdown
-### [SEVERITY] Issue Title
+# 🔍 ABP Framework Comprehensive Analysis Report
+
+**Project:** [Project Name]
+**ABP Version:** X.X.X
+**.NET Version:** X.X
+**Database:** [Database Type]
+**Architecture:** [Architecture Pattern]
+**Analysis Date:** YYYY-MM-DD
+**Analyzed By:** ABP Framework Analyzer Skill
+
+---
+
+## 📊 Executive Summary
+
+### Overall Assessment: **[RATING]**
+
+[Brief assessment paragraph]
+
+### Quick Stats
+
+| Category | Status |
+|----------|--------|
+| Clean Architecture Compliance | [✅/❌ + Description] |
+| Domain-Driven Design | [✅/❌ + Description] |
+| Async/Await Pattern | [✅/❌ + Description] |
+| Authorization & Security | [✅/❌ + Description] |
+| Performance Optimization | [✅/❌ + Description] |
+| Code Quality | [✅/❌ + Description] |
+
+---
+
+## Table of Contents
+
+1. [Critical Issues](#critical-issues)
+2. [High Priority Issues](#high-priority-issues)
+3. [Medium Priority Issues](#medium-priority-issues)
+4. [Strengths & Best Practices](#strengths--best-practices)
+5. [Summary & Priority Roadmap](#summary--priority-roadmap)
+6. [Recommended Immediate Actions](#recommended-immediate-actions)
+7. [References & Resources](#references--resources)
+
+---
+
+## 🚨 CRITICAL ISSUES (X)
+
+### 🚨 CRITICAL #1: [Issue Title]
 
 **Location:** `path/to/file.cs:123`
 
-**Category:** [DDD Violation | Clean Architecture Violation | ABP Anti-Pattern | Performance | Security | Architecture]
+**Severity:** CRITICAL
+**Category:** [DDD Violation | Clean Architecture | ABP Anti-Pattern | Security | Performance]
+**Estimated Fix Time:** [X minutes/hours]
 
-**DDD/Clean Architecture Principle:**
-[Which principle or pattern is violated, if applicable]
+#### Problem
 
-**Problem:**
-[Specific description of the issue]
+[Clear description of what's wrong]
 
-**Impact:**
-[Consequences if not fixed - technical debt, maintainability, performance, security]
+#### Impact
 
-**Fix:**
+- [Bullet point impacts]
+- [Security/performance/maintainability concerns]
+- [Business consequences]
+
+#### Current Code (Problematic)
+
 ```csharp
-// ❌ Current (problematic)
-[current code]
-
-// ✅ Recommended (2025 best practice)
-[fixed code with explanation following DDD/Clean Architecture principles]
+// ❌ NO authorization - Anyone can access these endpoints!
+[problematic code with explanatory comments]
 ```
 
-**References:**
-- [Link to relevant ABP docs]
-- [DDD principle reference]
-- [Clean Architecture principle]
+#### Recommended Fix
+
+**Step 1: [First Action]**
+
+```csharp
+// ✅ Correct: [Description]
+[fixed code with detailed comments]
+```
+
+**Step 2: [Second Action]** (if multi-step)
+
+```csharp
+// ✅ [Description]
+[additional code]
+```
+
+#### Testing
+
+```bash
+# Test that fix works
+[command to test]
+# Expected: [expected output]
+
+# Test edge case
+[command]
+# Expected: [expected output]
+```
+
+#### References
+
+- [ABP Documentation Link](url)
+- [DDD Principle Reference](url)
+- [OWASP or other standard](url)
+
+---
+
+## 🔴 HIGH SEVERITY ISSUES (X)
+
+[Same format as Critical]
+
+---
+
+## ⚠️ MEDIUM SEVERITY ISSUES (X)
+
+[Same format as Critical, but can be more concise]
+
+---
+
+## ✅ STRENGTHS & BEST PRACTICES
+
+Your codebase demonstrates **[assessment]** in many areas. Here are the highlights:
+
+### ✅ #1: [Strength Title]
+
+**Finding:** [What was found that's good]
+
+**Evidence:**
+```
+✅ [Specific evidence]
+✅ [More evidence]
+✅ [More evidence]
+```
+
+**What This Means:**
+- [Positive impact]
+- [Why this matters]
+- [Benefits]
+
+**Example from Codebase:**
+
+```csharp
+// ✅ Excellent: [Description]
+[example of good code]
+```
+
+**Why This is Excellent:**
+- ✅ [Reason]
+- ✅ [Reason]
+- ✅ [Reason]
+
+---
+
+## 📋 Summary & Priority Roadmap
+
+### Issue Distribution by Severity
+
+| Severity | Count | Must Fix Before Production? |
+|----------|-------|----------------------------|
+| 🚨 **CRITICAL** | X | ✅ **YES - BLOCKERS** |
+| 🔴 **HIGH** | X | ✅ **YES - RECOMMENDED** |
+| ⚠️ **MEDIUM** | X | ⚠️ **RECOMMENDED** |
+| ℹ️ **LOW** | X | 🟢 **NICE TO HAVE** |
+| ✅ **STRENGTHS** | X+ | 🎉 **EXCELLENT** |
+
+### Overall Code Quality Score
+
+**Architecture:** [Grade] ([Rating])
+**Security:** [Grade] ([Rating])
+**Performance:** [Grade] ([Rating])
+**Maintainability:** [Grade] ([Rating])
+**Best Practices:** [Grade] ([Rating])
+
+**Overall:** **[Grade] ([Rating with note])**
+
+---
+
+### Priority Fix Order
+
+#### 🚨 IMMEDIATE (Pre-Production Blockers)
+
+**Must complete before any production deployment:**
+
+| # | Issue | File | Time | Priority |
+|---|-------|------|------|----------|
+| 1 | [Issue] | [File] | X min | **P0** |
+| 2 | [Issue] | [File] | X min | **P0** |
+
+**Total Time: ~X hours**
+
+---
+
+#### 🔴 BEFORE PRODUCTION (Strongly Recommended)
+
+| # | Issue | File | Time | Priority |
+|---|-------|------|------|----------|
+| X | [Issue] | [File] | X hour | **P1** |
+
+---
+
+#### ⚠️ TECHNICAL DEBT (Recommended)
+
+| # | Issue | Files | Time | Priority |
+|---|-------|-------|------|----------|
+| X | [Issue] | [Files] | X min each | **P2** |
+
+---
+
+## 🎯 RECOMMENDED IMMEDIATE ACTIONS
+
+### Phase 1: [Phase Name] (X Hours)
+
+**Objective:** [What this phase achieves]
+
+#### Step 1: [Action Name] (X Minutes)
+
+**Task 1.1: [Subtask]** (X minutes)
+
+```bash
+# Commands to execute
+[commands]
+```
+
+[Detailed instructions]
+
+**Task 1.2: [Subtask]** (X minutes)
+
+[Instructions]
+
+---
+
+### Phase 2: [Phase Name] (X Hours)
+
+[Same format]
+
+---
+
+### Verification Checklist
+
+Before deploying to production, verify:
+
+#### Security
+- [ ] [Checklist item]
+- [ ] [Checklist item]
+
+#### Testing
+- [ ] [Checklist item]
+- [ ] [Checklist item]
+
+#### Code Quality
+- [ ] [Checklist item]
+- [ ] [Checklist item]
+
+---
+
+## 📚 REFERENCES & RESOURCES
+
+### ABP Framework Documentation
+
+**Core Concepts:**
+- [ABP Link](url) - Description
+- [ABP Link](url) - Description
+
+**Advanced Topics:**
+- [Link](url)
+
+### Clean Architecture & DDD
+
+- [Link](url) - Description
+- [Link](url) - Description
+
+### Security
+
+**OWASP Guidelines:**
+- [Link](url)
+
+**ASP.NET Core Security:**
+- [Link](url)
+
+### Performance
+
+- [Link](url)
+
+### .NET & C#
+
+- [Link](url)
+
+---
+
+## 🎬 CONCLUSION
+
+### Final Verdict
+
+**Code Quality Grade: [Grade] ([Rating])**
+
+---
+
+### What's Exceptional ✅
+
+Your architecture demonstrates **[assessment]**:
+
+1. **[Strength]** - [Description]
+2. **[Strength]** - [Description]
+...
+
+---
+
+### Critical Gaps ❌
+
+**[Category] needs immediate attention:**
+
+1. **[Issue]** - [Description]
+2. **[Issue]** - [Description]
+
+---
+
+### Bottom Line
+
+**[Summary statement about production readiness]**
+
+[Detailed assessment paragraph]
+
+**Estimated Fix Time:** X-X hours total
+- Critical security fixes: X hour
+- [Other categories]: X hour
+
+[Final recommendation]
+
+---
+
+### Next Steps
+
+1. ✅ **[Action]** - [Details] (X hour)
+2. ✅ **[Action]** - [Details] (X minutes)
+3. ✅ **[Action]** - [Details]
+...
+
+---
+
+### Need Help?
+
+[Instructions for getting help]
+
+---
+
+**Report Generated:** YYYY-MM-DD
+**Analyzer:** ABP Framework Analyzer Skill with DDD Validation
+**Project:** [Project Name] (ABP X.X.X, .NET X.X)
+
+---
+
+*This report was generated by the ABP Framework Analyzer skill with comprehensive DDD validation, following Clean Architecture principles, ABP best practices, and 2025 industry standards.*
+```
+
+---
+
+### Individual Issue Format
+
+For each issue within the sections:
+
+```markdown
+### [EMOJI] [SEVERITY] #N: [Issue Title]
+
+**Location:** `path/to/file.cs:123`
+
+**Severity:** [CRITICAL/HIGH/MEDIUM/LOW]
+**Category:** [Category]
+**Estimated Fix Time:** X minutes
+
+#### Problem
+
+[Description]
+
+#### Impact
+
+- [Impact point]
+- [Impact point]
+
+#### Current Code (Problematic)
+
+```csharp
+// ❌ [Description of problem]
+[code]
+```
+
+#### Recommended Fix
+
+```csharp
+// ✅ [Description of solution]
+[code]
+```
+
+#### Testing
+
+```bash
+# [Test description]
+[command]
+# Expected: [output]
+```
+
+#### References
+
+- [Link](url)
 ```
 
 ## Severity Classification
