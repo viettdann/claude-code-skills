@@ -8,7 +8,7 @@ This document follows the official ABP Framework 2025 best practices and Domain-
 
 - [I. Performance and Scalability Anti-Patterns](#i-performance-and-scalability-anti-patterns)
 - [II. Security Anti-Patterns and Weaknesses](#ii-security-anti-patterns-and-weaknesses)
-- [III. Architectural and DDD Violations](#iii-architectural-and-ddd-violations-abp-specific)
+- [III. Architectural Violations](#iii-architectural-violations-abp-specific)
 - [IV. Maintainability and Over-Engineering Anti-Patterns](#iv-maintainability-and-over-engineering-anti-patterns)
 - [V. Additional Considerations](#v-additional-considerations-for-ai-agent)
 
@@ -301,9 +301,9 @@ Environment.GetEnvironmentVariable("ConnectionStrings__Default")
 
 ---
 
-## III. Architectural and DDD Violations (ABP Specific)
+## III. Architectural Violations (ABP Specific)
 
-These patterns violate the core principles of Domain-Driven Design and Clean Architecture, leading to tight coupling and poor maintainability.
+These patterns violate the core principles of Clean Architecture, leading to tight coupling and poor maintainability.
 
 | Pattern Name | Description | Detection Rule | Severity | Remediation |
 | :--- | :--- | :--- | :--- | :--- |
@@ -423,7 +423,7 @@ These patterns are common developer mistakes that lead to code complexity, reduc
 
 | Pattern Name | Description | Detection Rule | Severity | Remediation |
 | :--- | :--- | :--- | :--- | :--- |
-| **Anemic Domain Model** | Entities contain only data (getters/setters) and no business logic, forcing all logic into Application Services. This is a common DDD mistake. | Look for classes inheriting from `Entity` or `AggregateRoot` that contain only properties and no public methods that enforce business invariants or perform state changes. | High | Move business logic from Application Services into the Entities/Aggregate Roots themselves. Entities should protect their own state. |
+| **Anemic Domain Model** | Entities contain only data (getters/setters) and no business logic, forcing all logic into Application Services. This violates separation of concerns and makes code harder to maintain. | Look for classes inheriting from `Entity` or `AggregateRoot` that contain only properties and no public methods that enforce business invariants or perform state changes. | High | Move business logic from Application Services into the Entities/Aggregate Roots themselves. Entities should protect their own state. |
 | **Overly Large Aggregate** | An Aggregate Root that manages too many entities, leading to complex transaction boundaries and high locking contention. | Look for classes inheriting from `AggregateRoot` that have more than 5-7 direct child collections or properties referencing other entities, or where the root class exceeds 200 lines of code. | Medium | Decompose the large aggregate into smaller, more focused aggregates. Use eventual consistency for communication between aggregates. |
 | **Over-Abstraction / YAGNI Violation** | Introducing unnecessary layers, interfaces, or patterns (e.g., Generic Repository on top of ABP Repository) for functionality that is not required (You Ain't Gonna Need It). | Look for interfaces with only one implementation, or base classes with no derived classes, especially in the Application or Domain layers. Look for custom generic repository implementations that simply wrap ABP's built-in `IRepository`. | Medium | Remove the unnecessary abstraction. Follow the principle of "Simple is better" and only introduce complexity when a concrete problem demands it. |
 | **Catch-All Exception Handling** | Catching a generic exception (`catch (Exception e)`) and either logging it and continuing, or re-throwing it without adding context, losing the original stack trace. | Look for `catch (Exception e)` blocks that do not use `throw;` to re-throw (instead using `throw e;` or just logging and exiting), or that catch and log without providing meaningful context. | Medium | Catch specific exceptions. If catching `Exception`, ensure the original stack trace is preserved using `throw;` or wrap it in a new exception with the original as the inner exception. |
@@ -617,24 +617,20 @@ public class Order : AggregateRoot<Guid>
 
 - **Critical**:
   - Data corruption risks, deadlocks, security vulnerabilities
-  - Major DDD violations (anemic domain models with complex business logic in services)
   - Clean Architecture dependency rule violations (domain depending on infrastructure)
-  - Aggregate boundary violations causing data inconsistency
   - SQL injection vulnerabilities
   - Missing authorization on sensitive operations
+  - Business logic in wrong layers (services instead of entities)
 
 - **High**:
   - Performance degradation, memory leaks, N+1 queries
-  - Missing domain logic in entities (business rules in application services)
-  - Value object mutability
   - Missing authorization or input validation
   - Repository pattern violations (interfaces in wrong layer)
-  - Domain events published from wrong layer
-  - Cross-aggregate direct references
   - Exposing entities instead of DTOs
+  - Async/sync violations
 
 - **Medium**:
-  - Code duplication, missing domain services
+  - Code duplication
   - Inefficient queries, primitive obsession
   - Missing value objects for domain concepts
   - Coupling issues between application services
@@ -660,11 +656,10 @@ The successful implementation of a code scanning agent requires a clear, rule-ba
 
 **Prioritization for AI Agent:**
 1. **Critical** and **High** severity findings (immediate risks)
-2. **DDD violations** (foundation for maintainability)
-3. **Clean Architecture violations** (long-term architectural health)
-4. **Performance issues** (user experience impact)
-5. **Medium** and **Low** findings (technical debt reduction)
+2. **Clean Architecture violations** (long-term architectural health)
+3. **Performance issues** (user experience impact)
+4. **Medium** and **Low** findings (technical debt reduction)
 
 ---
 
-*This reference document is based on ABP Framework 2025 best practices and industry-standard Domain-Driven Design tactical patterns.*
+*This reference document is based on ABP Framework 2025 best practices and Clean Architecture principles.*

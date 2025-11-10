@@ -1,27 +1,18 @@
 # ABP Framework Code Analyzer
 
-**2025 Edition**: Comprehensive code quality analyzer and architectural auditor for ABP Framework .NET projects with enhanced DDD tactical pattern validation, Clean Architecture compliance checking, and 50+ anti-pattern detection rules.
+**2025 Edition**: Comprehensive code quality analyzer and architectural auditor for ABP Framework .NET projects with Clean Architecture compliance checking and 40+ anti-pattern detection rules.
 
 ## Key Features
 
 ✅ **Self-Contained**: Includes comprehensive knowledge base (REFERENCE.md) - fully portable
-✅ **2025 Standards**: Latest DDD tactical patterns and Clean Architecture principles
-✅ **50+ Detection Rules**: Performance, security, architecture, maintainability, observability
+✅ **2025 Standards**: Latest Clean Architecture principles and ABP best practices
+✅ **40+ Detection Rules**: Performance, security, architecture, maintainability, observability
 ✅ **Standalone Scripts**: Quick scans without AI overhead
 ✅ **Progressive Disclosure**: Load detailed docs only when needed
 
 ## What This Skill Analyzes
 
-### Domain-Driven Design (DDD) Tactical Patterns ⭐ 2025 Focus
-- **Entity Design**: Rich vs anemic domain models, invariant protection, private setters
-- **Value Objects**: Immutability, validation, primitive obsession detection (Email, Phone, Money)
-- **Aggregates**: Consistency boundaries (5-7 entities max), cross-aggregate references
-- **Domain Events**: Placement in entities vs application services, event-driven architecture
-- **Domain Services**: Multi-aggregate coordination, business logic placement vs application services
-- **Repository Pattern**: Collection-like interfaces, domain layer placement (Dependency Inversion)
-- **Bounded Contexts**: Natural domain boundaries and modularization opportunities
-
-### Clean Architecture Principles ⭐ NEW
+### Clean Architecture Principles
 - **Dependency Rule**: Inward-pointing dependencies validation
 - **Layer Separation**: Domain, Application, Infrastructure, Web concerns
 - **Interface Adapters**: DTO usage, entity boundary protection
@@ -71,33 +62,19 @@ This skill includes comprehensive reference documentation:
 
 ## Usage
 
-### Comprehensive DDD & Clean Architecture Audit ⭐ 2025 Edition
+### Comprehensive Clean Architecture Audit
 ```
-User: "Analyze this ABP project for DDD violations and Clean Architecture compliance"
+User: "Analyze this ABP project for Clean Architecture compliance"
 ```
 
 The skill will:
-1. Explore project structure and identify bounded contexts
-2. Validate DDD tactical patterns (entities, value objects, aggregates)
-3. Check Clean Architecture dependency rules
-4. Verify layer responsibilities and boundaries
+1. Explore project structure and layer organization
+2. Check Clean Architecture dependency rules
+3. Verify layer responsibilities and boundaries
+4. Identify architectural violations
 5. Generate comprehensive architectural report
 
-### Domain Model Validation ⭐ NEW
-```
-User: "Check if my domain entities are anemic"
-User: "Validate my aggregate boundaries"
-User: "Review value object implementations"
-```
-
-Examines:
-- Entity richness (behavior vs data)
-- Value object immutability
-- Aggregate consistency boundaries
-- Domain event usage
-- Business logic placement
-
-### Clean Architecture Compliance ⭐ NEW
+### Clean Architecture Compliance
 ```
 User: "Verify Clean Architecture layers in my ABP project"
 User: "Check for dependency rule violations"
@@ -117,7 +94,7 @@ User: "Scan my ABP project and report"
 The skill will:
 1. Explore project structure
 2. Identify ABP version and modules
-3. Run systematic DDD, Clean Architecture, and ABP scans
+3. Run systematic Clean Architecture and ABP scans
 4. Generate prioritized report with architectural recommendations
 
 ### Focused Analysis
@@ -126,11 +103,11 @@ User: "Check this ABP project for repository performance issues"
 ```
 
 Focuses on:
-- Repository pattern violations (DDD)
+- Repository pattern violations
 - Eager loading patterns
 - N+1 query problems
-- Aggregate loading efficiency
 - Query optimization opportunities
+- Missing pagination
 
 ### Security Audit
 ```
@@ -139,61 +116,55 @@ User: "Audit ABP application services for security issues"
 
 Examines:
 - Missing authorization attributes
-- Input validation gaps (including value object validation)
+- Input validation gaps
 - SQL injection vectors
 - Exposed sensitive data
 
 ## Report Format
 
-Reports include DDD violations, Clean Architecture issues, and ABP anti-patterns:
+Reports include Clean Architecture issues and ABP anti-patterns:
 
-### Example 1: DDD Violation (Anemic Domain Model)
+### Example 1: ABP Anti-Pattern (Business Logic in Application Service)
 ```markdown
-### [CRITICAL] Anemic Domain Model - Business Logic in Application Service
+### [HIGH] Business Logic in Application Service Layer
 
 **Location:** `src/Acme.BookStore.Application/Orders/OrderAppService.cs:67`
 
-**Category:** DDD Violation
+**Category:** ABP Anti-Pattern
 
-**DDD Principle:** Entities should encapsulate behavior and protect invariants
+**Clean Architecture Principle:** Application services should be thin orchestrators, not contain business logic
 
 **Problem:**
-Order confirmation logic is implemented in application service instead of Order entity,
-resulting in an anemic domain model. Business rules are scattered across services.
+Order confirmation logic is implemented in application service instead of Order entity.
+Business rules are scattered across services making code harder to maintain and test.
 
 **Impact:**
-- Violates DDD tactical patterns (2025 best practice)
 - Business logic not reusable or testable in isolation
 - Entity can be put in invalid state
 - Difficult to maintain consistency
+- Violates separation of concerns
 
 **Fix:**
 ```csharp
-// ❌ Current (anemic entity)
-public class Order : AggregateRoot<Guid>
-{
-    public OrderStatus Status { get; set; } // Public setter
-    public decimal Total { get; set; }
-}
-
+// ❌ Current (business logic in app service)
 public class OrderAppService : ApplicationService
 {
     public async Task ConfirmAsync(Guid id)
     {
         var order = await _repository.GetAsync(id);
-        if (order.Status != OrderStatus.Pending) // Business logic here!
+        if (order.Status != OrderStatus.Pending) // Business logic in wrong layer!
             throw new BusinessException("Cannot confirm");
         order.Status = OrderStatus.Confirmed;
     }
 }
 
-// ✅ Recommended (rich domain entity - 2025 DDD best practice)
+// ✅ Recommended (business logic in domain entity - 2025 best practice)
 public class Order : AggregateRoot<Guid>
 {
-    public OrderStatus Status { get; private set; } // Private setter
+    public OrderStatus Status { get; private set; } // Private setter protects state
     public decimal Total { get; private set; }
 
-    public void Confirm() // Business logic in entity
+    public void Confirm() // Business logic encapsulated in entity
     {
         if (Status != OrderStatus.Pending)
             throw new BusinessException(OrderDomainErrorCodes.OrderNotPending);
@@ -215,7 +186,7 @@ public class OrderAppService : ApplicationService
 
 **References:**
 - [ABP Domain Entities](https://abp.io/docs/latest/framework/architecture/domain-driven-design/entities)
-- [DDD Tactical Patterns](https://martinfowler.com/bliki/AnemicDomainModel.html)
+- [Clean Architecture Layers](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
 ```
 
 ### Example 2: Clean Architecture Violation
@@ -335,24 +306,14 @@ Before upgrading ABP version:
 ```
 
 ### 5. Architecture Review
-Validate DDD implementation:
+Validate Clean Architecture implementation:
 ```
-"Review domain model and repository patterns in ABP project"
+"Review architecture and repository patterns in ABP project"
 ```
 
 ## Common Issues Found
 
 Based on 2025 ABP Framework analysis across 100+ projects, most common issues are:
-
-### 🔴 DDD Violations (2025 Focus Areas)
-| Issue | Severity | Frequency | Impact |
-|-------|----------|-----------|--------|
-| **Anemic Domain Models** | CRITICAL | 75% | Business logic scattered, difficult to maintain |
-| **Primitive Obsession** | HIGH | 85% | Missing value objects (Email, Phone, Money, Address) |
-| **Improper Aggregate Boundaries** | HIGH | 60% | Aggregates too large (>5-7 entities) or cross-referencing |
-| **Domain Events from Wrong Layer** | MEDIUM | 45% | Events published from application services, not entities |
-| **Missing Domain Services** | MEDIUM | 50% | Multi-entity logic in application layer |
-| **Repository Interfaces in Infrastructure** | HIGH | 40% | Violates Dependency Inversion Principle |
 
 ### 🟡 Clean Architecture Violations
 | Issue | Severity | Frequency | Impact |
@@ -395,15 +356,13 @@ Based on 2025 ABP Framework analysis across 100+ projects, most common issues ar
 
 Automatically activates when user mentions:
 - "ABP" + "scan/analyze/audit/review/check"
-- "ABP Framework" + "code quality/DDD/Clean Architecture"
+- "ABP Framework" + "code quality/Clean Architecture"
 - "ABP project" + "issues/problems/anti-patterns"
 - "Review ABP best practices"
-- "Domain-driven design" + "ABP"
 - "Clean Architecture" + "ABP/.NET"
-- "Anemic domain model" + "check/validate"
-- "Aggregate boundaries" + "review"
-- "Value objects" + "validation"
 - "Repository pattern" + "ABP"
+- "Performance issues" + "ABP"
+- "Security audit" + "ABP"
 
 ## Requirements
 
@@ -449,15 +408,8 @@ git push
 - **ABP Framework**
   - [ABP Documentation](https://abp.io/docs)
   - [ABP Best Practices](https://abp.io/docs/latest/framework/architecture/best-practices)
-  - [ABP Domain-Driven Design](https://abp.io/docs/latest/framework/architecture/domain-driven-design)
+  - [ABP Architecture](https://abp.io/docs/latest/framework/architecture)
   - [ABP GitHub](https://github.com/abpframework/abp)
-
-- **Domain-Driven Design**
-  - [DDD Reference](https://www.domainlanguage.com/ddd/) - Eric Evans
-  - [Implementing DDD](https://vaughnvernon.com/) - Vaughn Vernon
-  - [Anemic Domain Model](https://martinfowler.com/bliki/AnemicDomainModel.html) - Martin Fowler
-  - [DDD Aggregates](https://martinfowler.com/bliki/DDD_Aggregate.html)
-  - [Domain Events](https://learn.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/domain-events-design-implementation)
 
 - **Clean Architecture**
   - [Clean Architecture](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html) - Uncle Bob
@@ -499,4 +451,4 @@ rg "regex-pattern" --type cs -g "**/*AppService.cs"
 
 ---
 
-**2025 Edition** | **Self-Contained** | **50+ Detection Rules** | **Portable & Team-Ready**
+**2025 Edition** | **Self-Contained** | **40+ Detection Rules** | **Portable & Team-Ready**
