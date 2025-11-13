@@ -222,7 +222,6 @@ Generate a comprehensive markdown report using the Write tool with this structur
 
 **Severity:** CRITICAL
 **Category:** Security | Data Corruption | System Crash
-**Estimated Fix Time:** X minutes
 
 #### Problem
 
@@ -476,11 +475,6 @@ Before deploying to production, verify:
 ### Bottom Line
 
 [2-3 paragraphs with final assessment, readiness for production, and next steps]
-
-**Estimated Fix Time:** X hours/days total
-- Critical/high priority fixes: X hours
-- Medium priority improvements: X hours
-- Low priority enhancements: X days
 
 **Recommendation:** [Clear recommendation about production readiness and what must be done]
 

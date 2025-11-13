@@ -140,7 +140,6 @@ This commit adds user authentication functionality to the API. While the impleme
 **Location:** `src/api/auth.ts:23`
 **Severity:** CRITICAL
 **Category:** Security
-**Estimated Fix Time:** 5 minutes
 
 #### Problem
 

@@ -82,7 +82,6 @@ interface ReviewSummary {
     low: number;
   };
   strengthsCount: number;
-  estimatedFixTime: number;     // Total minutes
   productionReady: boolean;
 }
 
@@ -100,7 +99,6 @@ interface Issue {
   currentCode?: string;         // Problematic code snippet
   recommendedFix?: string;      // Fixed code snippet
   fixOptions?: FixOption[];     // Multiple fix approaches
-  estimatedFixTime: number;     // Minutes
   references: string[];         // URLs to docs
   tags: string[];               // ["sql-injection", "security", "owasp"]
   autoFixable: boolean;         // Can be auto-fixed?
@@ -189,7 +187,6 @@ interface MetricScore {
         "low": 0
       },
       "strengthsCount": 3,
-      "estimatedFixTime": 20,
       "productionReady": false
     },
     "issues": [
@@ -232,7 +229,6 @@ interface MetricScore {
             ]
           }
         ],
-        "estimatedFixTime": 5,
         "references": [
           "https://owasp.org/www-community/attacks/SQL_Injection",
           "https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html"
@@ -256,7 +252,6 @@ interface MetricScore {
         ],
         "currentCode": "await db.execute('INSERT INTO users (email, password) VALUES (?, ?)', [email, password]);",
         "recommendedFix": "import bcrypt from 'bcrypt';\nconst hashedPassword = await bcrypt.hash(password, 10);\nawait db.execute('INSERT INTO users (email, password) VALUES (?, ?)', [email, hashedPassword]);",
-        "estimatedFixTime": 10,
         "references": [
           "https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html"
         ],
@@ -277,7 +272,6 @@ interface MetricScore {
           "Poor user experience with confusing errors"
         ],
         "recommendedFix": "import { z } from 'zod';\nconst emailSchema = z.string().email();\nconst validatedEmail = emailSchema.parse(email);",
-        "estimatedFixTime": 5,
         "references": [
           "https://github.com/colinhacks/zod"
         ],
@@ -424,7 +418,6 @@ review:
       medium: 1
       low: 0
     strengthsCount: 3
-    estimatedFixTime: 20
     productionReady: false
 
   issues:
@@ -442,7 +435,6 @@ review:
       recommendedFix: |
         const query = 'SELECT * FROM users WHERE email = ?';
         db.execute(query, [email]);
-      estimatedFixTime: 5
       references:
         - https://owasp.org/www-community/attacks/SQL_Injection
       tags: [sql-injection, security, owasp-a03]

@@ -58,7 +58,6 @@ This template provides the structure for auto-generated code review reports. The
 **Location:** `path/to/file.ext:line`
 **Severity:** CRITICAL
 **Category:** [Category]
-**Estimated Fix Time:** X minutes
 
 #### Problem
 [Description]
@@ -206,7 +205,6 @@ This template provides the structure for auto-generated code review reports. The
 ### Bottom Line
 [Assessment]
 
-**Estimated Fix Time:** X hours
 **Recommendation:** [Recommendation]
 
 ### Next Steps
@@ -266,7 +264,6 @@ Each issue should include:
 - **Location**: File path with line number
 - **Severity**: CRITICAL, HIGH, MEDIUM, or LOW
 - **Category**: Type of issue (Security, Performance, Code Quality, etc.)
-- **Estimated Fix Time**: Realistic time estimate
 - **Problem**: 2-3 sentences explaining the issue
 - **Impact**: Bulleted list of consequences
 - **Current Code**: Code showing the problem with ❌ marker
