@@ -74,7 +74,7 @@ See [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md) for the complete report structure.
 
 **JSON Includes:**
 - Complete issue details with file paths and line numbers
-- Severity levels, priorities, and time estimates
+- Severity levels and priorities
 - Recommended fixes with code examples
 - Production readiness flag for merge gates
 - Metrics and grades for tracking trends
@@ -147,7 +147,7 @@ Each generated report includes:
 5. **⚠️ Medium Priority Issues**: Code quality improvements, technical debt
 6. **ℹ️ Low Priority Issues**: Style suggestions, minor optimizations
 7. **✅ Strengths & Best Practices**: What the code does well (5-10 examples)
-8. **📋 Summary & Priority Roadmap**: Issue distribution, fix order, time estimates
+8. **📋 Summary & Priority Roadmap**: Issue distribution, fix order prioritization
 9. **🎯 Recommended Immediate Actions**: Step-by-step fix guide with code
 10. **📚 References & Resources**: Links to documentation, OWASP, framework guides
 11. **🎬 Conclusion**: Final verdict, production readiness, next steps

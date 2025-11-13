@@ -165,7 +165,7 @@ Generate a comprehensive markdown report following the complete structure define
 - Executive summary with overall grade (A+ to F)
 - Severity-classified issues (Critical, High, Medium, Low)
 - Strengths and best practices identified
-- Priority roadmap with time estimates
+- Priority roadmap
 - Recommended immediate actions with phases
 - Verification checklist for production readiness
 - References and resources
@@ -176,7 +176,6 @@ Generate a comprehensive markdown report following the complete structure define
 - **Show code examples**: Use ❌ Before / ✅ After format
 - **Provide fixes**: Include step-by-step remediation
 - **Reference docs**: Link to official framework documentation
-- **Estimate effort**: Add time estimates for each fix
 
 See [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md) for the complete template structure.
 
@@ -407,8 +406,8 @@ Verdict: [LGTM / Needs Changes / Blocked]
 
 [If issues found:]
 ⚠️ Top Priority Items:
-1. [Issue title] - file.ext:line (X min fix)
-2. [Issue title] - file.ext:line (X min fix)
+1. [Issue title] - file.ext:line
+2. [Issue title] - file.ext:line
 
 📖 Full details in the report file.
 ```

@@ -165,7 +165,7 @@ The skill creates a comprehensive report including:
 1. **Executive Summary** - Grade, key findings, quick stats table
 2. **All Issues** - Detailed analysis with code examples and fixes
 3. **Strengths** - What the code does well
-4. **Priority Roadmap** - Time estimates, fix order
+4. **Priority Roadmap** - Fix order prioritization
 5. **Immediate Actions** - Step-by-step fix guide
 6. **References** - Links to documentation
 7. **Conclusion** - Production readiness assessment
@@ -175,8 +175,8 @@ The skill creates a comprehensive report including:
 **For Developers:**
 - Detailed reference to work through fixes systematically
 - Learn from strengths identified in their code
-- Time estimates help with planning
 - Code examples show exactly what to change
+- Clear priority order for addressing issues
 
 **For Teams:**
 - Shareable documentation for PR discussions
@@ -186,7 +186,7 @@ The skill creates a comprehensive report including:
 
 **For Managers:**
 - Clear production readiness assessment
-- Prioritized fix lists with time estimates
+- Prioritized fix lists
 - Quality metrics across the codebase
 - Track improvement over time
 

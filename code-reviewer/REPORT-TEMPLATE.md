@@ -149,19 +149,19 @@ This template provides the structure for auto-generated code review reports. The
 ### Priority Fix Order
 
 #### 🚨 IMMEDIATE
-| # | Issue | File | Time | Priority |
-|---|-------|------|------|----------|
-| 1 | [Issue] | `file:line` | X min | **P0** |
+| # | Issue | File | Priority |
+|---|-------|------|----------|
+| 1 | [Issue] | `file:line` | **P0** |
 
 ---
 
 ## 🎯 RECOMMENDED IMMEDIATE ACTIONS
 
-### Phase 1: [Phase Name] (X Time)
+### Phase 1: [Phase Name]
 
 **Objective:** [Objective]
 
-#### Step 1.1: [Task] (X Time)
+#### Step 1.1: [Task]
 
 ```language
 [code/commands]
@@ -208,7 +208,7 @@ This template provides the structure for auto-generated code review reports. The
 **Recommendation:** [Recommendation]
 
 ### Next Steps
-1. ✅ **[Task]** - [Time]
+1. ✅ **[Task]**
 
 ---
 
@@ -224,10 +224,10 @@ This template provides the structure for auto-generated code review reports. The
 ### Quick Links to Issues
 
 **CRITICAL:**
-- [Link] - X min
+- [Link]
 
 **HIGH:**
-- [Link] - X min
+- [Link]
 
 ### File Locations Quick Reference
 
@@ -332,9 +332,8 @@ Use consistent naming:
 2. **Be actionable**: Provide concrete fixes, not just problems
 3. **Be balanced**: Highlight both issues and strengths
 4. **Be thorough**: Cover all changed files, not just problematic ones
-5. **Be practical**: Estimate fix times realistically
-6. **Be educational**: Explain why issues matter
-7. **Be constructive**: Focus on improvement, not criticism
+5. **Be educational**: Explain why issues matter
+6. **Be constructive**: Focus on improvement, not criticism
 
 ### Example Report Locations
 
