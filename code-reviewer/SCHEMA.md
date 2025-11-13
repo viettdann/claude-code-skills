@@ -15,9 +15,10 @@ The skill generates both human-readable markdown reports AND machine-readable JS
 
 For each review, the skill generates:
 
-1. **Markdown Report**: `CODE-REVIEW-REPORT-{date}.md` (human-readable)
-2. **JSON Output**: `CODE-REVIEW-REPORT-{date}.json` (machine-readable)
-3. **YAML Output** (optional): `CODE-REVIEW-REPORT-{date}.yaml`
+1. **Markdown Report**: `CODE-REVIEW-REPORT-{date}.md` or `CODE-REVIEW-REPORT-{date}-{sha}.md` (human-readable)
+2. **JSON Output**: `CODE-REVIEW-REPORT-{date}.json` or `CODE-REVIEW-REPORT-{date}-{sha}.json` (machine-readable, compact format)
+
+**Note on JSON Format:** JSON output uses compact format (single-line, no indentation) to minimize file size for CI/CD systems and reduce token usage when parsed. This makes the JSON ideal for automated processing while keeping files lightweight.
 
 ## JSON Schema
 

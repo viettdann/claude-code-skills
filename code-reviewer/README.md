@@ -1,6 +1,6 @@
 # Code Reviewer Skill
 
-Expert code review skill for Claude Code that automatically reviews your code for quality, security, and best practices.
+Expert code review skill for Claude Code that automatically reviews code for quality, security, and best practices.
 
 ## Overview
 
@@ -15,11 +15,11 @@ The Code Reviewer skill provides professional-grade code reviews focusing on:
 
 ### Automatic Activation
 
-The skill activates automatically when:
-- You make code changes or commits
-- You mention "review", "commit", or "merge"
+Skill activates automatically when:
+- Code changes or commits are made
+- User mentions "review", "commit", or "merge"
 - After significant code modifications
-- You explicitly request a code review
+- Explicit code review request
 
 ### Comprehensive Analysis
 
@@ -42,29 +42,29 @@ Supports code review for:
 
 ### Automatic Report Generation
 
-**NEW**: The skill automatically generates comprehensive markdown reports for every review!
+**NEW**: Skill automatically generates comprehensive markdown reports for every review.
 
 **Features:**
 - **Detailed documentation** - Complete review saved as markdown file
 - **Professional format** - Executive summary, severity-classified issues, actionable fixes
-- **Persistent reference** - Keep reports for audit trail and tracking progress
+- **Persistent reference** - Reports serve as audit trail for tracking progress
 - **Shareable** - Easy to share with team or include in PR discussions
 - **Comprehensive structure** - Includes Quick Stats, Priority Roadmap, Immediate Actions
 
-**Report Files:**
-- `CODE-REVIEW-REPORT-2025-01-13.md` (general reviews)
-- `CODE-REVIEW-REPORT-abc1234-2025-01-13.md` (commit-specific)
-- `SECURITY-AUDIT-REPORT-2025-01-13.md` (security-focused)
+**Report Filenames:**
+- `CODE-REVIEW-REPORT-2025-01-13.md` (general reviews, no commit)
+- `CODE-REVIEW-REPORT-2025-01-13-abc1234.md` (commit-specific reviews)
+- `SECURITY-AUDIT-REPORT-2025-01-13.md` (security-focused audits)
 
-See [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md) for the complete report structure.
+See [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md) for complete report structure.
 
-### JSON/YAML Output for PR Automation
+### JSON Output for PR Automation
 
-**NEW**: The skill also generates machine-readable JSON output alongside markdown reports!
+**NEW**: Skill generates machine-readable JSON output alongside markdown reports.
 
-**What's Generated:**
+**Generated Files:**
 - `CODE-REVIEW-REPORT-2025-01-13.md` (human-readable markdown)
-- `CODE-REVIEW-REPORT-2025-01-13.json` (machine-readable JSON)
+- `CODE-REVIEW-REPORT-2025-01-13.json` (machine-readable JSON, compact format)
 
 **Use Cases:**
 - **Automated PR Comments** - Post inline comments on specific lines of code
@@ -79,15 +79,15 @@ See [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md) for the complete report structure.
 - Production readiness flag for merge gates
 - Metrics and grades for tracking trends
 
-**Documentation:**
-- See [scripts/README.md](scripts/README.md) for JSON structure details
-- See [SCHEMA.md](SCHEMA.md) for complete JSON schema
+**Format:** JSON output uses compact format (no pretty-printing) to minimize file size for CI/CD systems and reduce token usage when parsed.
+
+**Documentation:** See [SCHEMA.md](SCHEMA.md) for complete JSON schema and structure details.
 
 ## Usage
 
 ### Basic Usage
 
-Simply ask Claude to review your code:
+Ask Claude to review code:
 
 ```
 Review my latest commit
@@ -129,12 +129,12 @@ Review this code for React best practices
 
 ### Report File Generation
 
-**The skill automatically creates a comprehensive markdown report file for every review.**
+Skill automatically creates comprehensive markdown report file for every review.
 
-The report is saved in your project root with a filename like:
-- `CODE-REVIEW-REPORT-2025-01-13.md`
-- `CODE-REVIEW-REPORT-abc1234-2025-01-13.md` (for commit reviews)
-- `SECURITY-AUDIT-REPORT-2025-01-13.md` (for security audits)
+Report saved in project root with filename format:
+- `CODE-REVIEW-REPORT-2025-01-13.md` (general reviews)
+- `CODE-REVIEW-REPORT-2025-01-13-abc1234.md` (commit-specific reviews)
+- `SECURITY-AUDIT-REPORT-2025-01-13.md` (security audits)
 
 ### Report Structure
 
@@ -208,12 +208,13 @@ cp -r code-reviewer ~/.claude/skills/
 
 ### Allowed Tools
 
-The skill uses these tools:
+Skill uses these tools:
 - `Bash`: Git operations, commit analysis
-- `Read`: Reading file contents
+- `Read`: Read file contents
 - `Grep`: Pattern-based detection
-- `Glob`: Finding related files
+- `Glob`: Find related files
 - `Task`: Complex codebase exploration
+- `Write`: Generate report files
 
 ## Best Practices
 
@@ -227,20 +228,20 @@ The skill uses these tools:
 
 ### Workflow Integration
 
-1. **Make your changes**
-2. **Commit your code**
-3. **Ask for review**: "Review my latest commit"
-4. **Address critical issues** immediately
-5. **Fix high priority issues** before merge
-6. **Plan medium/low issues** for future iterations
+1. Make code changes
+2. Commit code
+3. Ask for review: "Review my latest commit"
+4. Address critical issues immediately
+5. Fix high priority issues before merge
+6. Plan medium/low issues for future iterations
 
 ### Getting the Most Value
 
-- **Review frequently**: Catch issues early
-- **Act on critical issues**: Don't ignore security problems
-- **Learn from feedback**: Understand why issues matter
-- **Ask questions**: If you don't understand a finding
-- **Iterate**: Apply learnings to future code
+- Review frequently to catch issues early
+- Act on critical issues immediately
+- Learn from feedback to understand why issues matter
+- Ask questions if findings are unclear
+- Apply learnings to future code
 
 ## Severity Levels
 
@@ -314,7 +315,7 @@ Examples:
 Review the merge commit for integration issues
 ```
 
-The skill will:
+Skill will:
 - Check conflict resolution
 - Verify integration correctness
 - Identify regression risks
@@ -342,10 +343,10 @@ Compare the current code against the previous commit
 
 ### Too Many False Positives
 
-The skill reads full context to minimize false positives, but if you encounter them:
-- Mention your framework/conventions upfront
+Skill reads full context to minimize false positives. If encountering false positives:
+- Mention framework/conventions upfront
 - Provide context: "This is test code" or "This is a migration file"
-- Ask for focused review: "Review only security issues"
+- Request focused review: "Review only security issues"
 
 ### Review Too Broad
 

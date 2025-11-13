@@ -53,7 +53,7 @@ git diff --staged
 
 ### 2. Analyze Changed Files
 
-For each changed file:
+For each file:
 
 1. **Read the full file** to understand context
 2. **Identify the specific changes** using git diff
@@ -61,7 +61,7 @@ For each changed file:
 
 ### 3. Review Dimensions
 
-Review code across these critical areas:
+Review code across critical areas:
 
 #### Security Vulnerabilities
 
@@ -147,14 +147,14 @@ COMMIT_SHA=$(git log -1 --format=%h)
 REVIEW_DATE=$(date +%Y-%m-%d)
 
 # Generate filename (one of these patterns):
-# 1. For commit reviews: CODE-REVIEW-REPORT-${COMMIT_SHA}-${REVIEW_DATE}.md
+# 1. For commit reviews: CODE-REVIEW-REPORT-${REVIEW_DATE}-${COMMIT_SHA}.md
 # 2. For general reviews: CODE-REVIEW-REPORT-${REVIEW_DATE}.md
 # 3. For security audits: SECURITY-AUDIT-REPORT-${REVIEW_DATE}.md
 ```
 
 **Examples:**
 - `CODE-REVIEW-REPORT-2025-01-13.md` (general review)
-- `CODE-REVIEW-REPORT-abc1234-2025-01-13.md` (commit review)
+- `CODE-REVIEW-REPORT-2025-01-13-abc1234.md` (commit review)
 - `SECURITY-AUDIT-REPORT-2025-01-13.md` (security audit)
 
 #### 4.2 Report Structure
@@ -223,7 +223,8 @@ After generating the markdown report, create a JSON file:
 # Generate JSON filename
 JSON_FILE="${REPORT_FILE%.md}.json"
 
-# Example: CODE-REVIEW-REPORT-2025-01-13.json
+# Example: CODE-REVIEW-REPORT-2025-01-13.json (general)
+# Example: CODE-REVIEW-REPORT-2025-01-13-abc1234.json (commit)
 ```
 
 #### 5.1 JSON Structure
@@ -238,7 +239,7 @@ Follow the complete schema defined in [SCHEMA.md](SCHEMA.md).
 - `files[]` - Per-file status
 - `metrics` - Quality scores
 
-**Important:** Generate **compact JSON** (no pretty-printing) to minimize file size.
+**Important:** Generate **compact JSON** (no pretty-printing) to minimize file size for CI/CD systems and reduce token usage when parsed.
 
 #### 5.2 Generation Workflow
 
@@ -250,8 +251,8 @@ REPORT_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 COMMIT_SHA=$(git log -1 --format=%h)
 PROJECT_NAME=$(basename $(git rev-parse --show-toplevel))
 
-# 2. Generate JSON filename
-JSON_FILE="CODE-REVIEW-REPORT-${COMMIT_SHA}-$(date +%Y-%m-%d).json"
+# 2. Generate JSON filename (must match markdown report filename)
+JSON_FILE="CODE-REVIEW-REPORT-$(date +%Y-%m-%d)-${COMMIT_SHA}.json"
 
 # 3. Use Write tool to create COMPACT JSON (no pretty-printing)
 # Populate with all findings organized according to schema
@@ -272,8 +273,8 @@ echo "📊 JSON output: ${JSON_FILE}"
 ```
 
 **Notes:**
-- Generate **compact JSON** (single-line, no indentation) for minimal file size
-- Validate with `jq` if available - fails fast if JSON is malformed
+- Generate **compact JSON** (single-line, no indentation) to minimize file size for CI/CD systems and reduce token usage when parsed
+- Validate with `jq` if available (optional but recommended) - fails fast if JSON is malformed
 - JSON can be used for PR automation, CI/CD integration, or custom tooling
 
 ## Review Guidelines

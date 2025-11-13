@@ -321,8 +321,8 @@ Each issue should include:
 
 Use consistent naming:
 
-- **Commit review**: `CODE-REVIEW-REPORT-{commit-sha}-{YYYY-MM-DD}.md`
 - **General review**: `CODE-REVIEW-REPORT-{YYYY-MM-DD}.md`
+- **Commit review**: `CODE-REVIEW-REPORT-{YYYY-MM-DD}-{commit-sha}.md`
 - **Security audit**: `SECURITY-AUDIT-REPORT-{YYYY-MM-DD}.md`
 - **Performance review**: `PERFORMANCE-REVIEW-REPORT-{YYYY-MM-DD}.md`
 
