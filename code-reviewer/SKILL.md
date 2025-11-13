@@ -1,7 +1,7 @@
 ---
 name: code-reviewer
-description: Expert code reviewer for code quality, security, and best practices. Use proactively after code changes, commits, merges, or when user requests code review. Analyzes latest commits including merge commits.
-allowed-tools: Bash, Read, Grep, Glob, Task
+description: Expert code reviewer for code quality, security, and best practices. Use proactively after code changes, commits, merges, or when user requests code review. Analyzes latest commits including merge commits. Automatically generates comprehensive markdown reports.
+allowed-tools: Bash, Read, Grep, Glob, Task, Write
 ---
 
 # Code Reviewer
@@ -128,66 +128,456 @@ Verify:
 **Other languages:**
 - Apply language-specific idioms and conventions
 
-### 4. Generate Review Report
+### 4. Generate Comprehensive Review Report
 
-Provide feedback in this structure:
+**IMPORTANT**: Always generate a comprehensive markdown report file that documents all findings.
+
+#### 4.1 Determine Report Filename
+
+Generate report filename based on context:
+
+```bash
+# Get project name from git root directory
+PROJECT_NAME=$(basename $(git rev-parse --show-toplevel))
+
+# Get commit SHA if reviewing commit
+COMMIT_SHA=$(git log -1 --format=%h)
+
+# Get current date
+REVIEW_DATE=$(date +%Y-%m-%d)
+
+# Generate filename (one of these patterns):
+# 1. For commit reviews: CODE-REVIEW-REPORT-${COMMIT_SHA}-${REVIEW_DATE}.md
+# 2. For general reviews: CODE-REVIEW-REPORT-${REVIEW_DATE}.md
+# 3. For security audits: SECURITY-AUDIT-REPORT-${REVIEW_DATE}.md
+```
+
+**Examples:**
+- `CODE-REVIEW-REPORT-2025-01-13.md` (general review)
+- `CODE-REVIEW-REPORT-abc1234-2025-01-13.md` (commit review)
+- `SECURITY-AUDIT-REPORT-2025-01-13.md` (security audit)
+
+#### 4.2 Report Structure
+
+Generate a comprehensive markdown report using the Write tool with this structure:
 
 ```markdown
-# Code Review: [Commit SHA/Description]
+# 🔍 [Project Name] Code Review Report
 
-## Summary
-- **Files Reviewed**: X files
-- **Lines Changed**: +X -Y
-- **Issues Found**: Z (Critical: A, High: B, Medium: C, Low: D)
-- **Overall Assessment**: [Brief verdict]
-
-## Critical Issues
-
-### [CRITICAL] Issue Title
-**File**: `path/to/file.ext:line`
-**Category**: Security | Performance | Correctness
-**Problem**: [Clear description of the issue]
-**Impact**: [What could go wrong]
-**Fix**:
-```language
-// ❌ Current (problematic)
-current code here
-
-// ✅ Recommended
-fixed code here
-```
-**References**: [Links to documentation]
+**Project:** [Project Name]
+**Framework:** [Framework/Stack - e.g., Next.js 14, ABP 9.3, etc.]
+**Language:** [Primary Language]
+**Analysis Date:** YYYY-MM-DD
+**Analyzed By:** Code Reviewer Skill
+**Commit/Branch:** [Commit SHA or branch name if applicable]
 
 ---
 
-## High Priority Issues
+## 📊 Executive Summary
 
-[Same format as Critical]
+### Overall Assessment: **[Grade - A+/A/A-/B+/B/C/F]**
 
-## Medium Priority Issues
+[2-3 paragraph summary of overall code quality, major findings, and recommendations]
 
-[Same format as Critical]
+**Key Highlights:**
+- ✅ [Strength 1]
+- ✅ [Strength 2]
+- ⚠️ [Major concern 1]
+- ⚠️ [Major concern 2]
 
-## Low Priority Issues
+### Quick Stats
 
-[Same format as Critical]
+| Category | Status |
+|----------|--------|
+| Security | [✅ Excellent / ⚠️ Needs Attention / 🔴 Critical Issues] |
+| Code Quality | [✅ Excellent / ⚠️ Good / 🔴 Poor] |
+| Performance | [✅ Excellent / ⚠️ Needs Optimization / 🔴 Issues Found] |
+| Best Practices | [✅ Following / ⚠️ Some Violations / 🔴 Many Violations] |
+| Test Coverage | [✅ Good / ⚠️ Partial / 🔴 Missing / N/A] |
 
-## Positive Observations
+---
 
-- [Things done well]
-- [Good patterns observed]
+## Table of Contents
 
-## Recommendations
+1. [Critical Issues](#critical-issues) (X)
+2. [High Priority Issues](#high-priority-issues) (X)
+3. [Medium Priority Issues](#medium-priority-issues) (X)
+4. [Low Priority Issues](#low-priority-issues) (X)
+5. [Strengths & Best Practices](#strengths--best-practices) (X+)
+6. [Summary & Priority Roadmap](#summary--priority-roadmap)
+7. [Recommended Immediate Actions](#recommended-immediate-actions)
+8. [References & Resources](#references--resources)
 
-1. [Actionable recommendations]
-2. [Best practices to adopt]
+---
 
-## Next Steps
+## 🚨 CRITICAL ISSUES (X)
 
-- [ ] Fix critical issues immediately
-- [ ] Address high priority issues before merge
-- [ ] Consider medium priority improvements
-- [ ] Review low priority items in backlog
+[If none:] **None Found!** 🎉
+
+[For each critical issue:]
+
+### 🚨 CRITICAL #1: [Issue Title]
+
+**Location:** `path/to/file.ext:line-range`
+
+**Severity:** CRITICAL
+**Category:** Security | Data Corruption | System Crash
+**Estimated Fix Time:** X minutes
+
+#### Problem
+
+[Detailed description of the issue - 2-3 sentences]
+
+#### Impact
+
+- 🔴 **[Impact point 1]** - [Description]
+- 🔴 **[Impact point 2]** - [Description]
+- ⚠️ **[Impact point 3]** - [Description]
+
+#### Current Code (Problematic)
+
+```language
+// ❌ Current implementation
+[problematic code with context]
+```
+
+#### Recommended Fix
+
+**Option 1: [Approach Name] (Recommended)**
+
+```language
+// ✅ Correct implementation
+[fixed code with context and comments explaining changes]
+```
+
+**Step-by-step:**
+1. [Step 1]
+2. [Step 2]
+3. [Step 3]
+
+**Option 2: [Alternative Approach] (If applicable)**
+
+[Alternative solution]
+
+#### Testing
+
+```bash
+# Test commands or scenarios
+[how to test the fix]
+```
+
+#### References
+
+- [Link to relevant documentation]
+- [Link to security best practices]
+- [Link to framework docs]
+
+---
+
+## 🔴 HIGH PRIORITY ISSUES (X)
+
+[Same detailed format as Critical]
+
+---
+
+## ⚠️ MEDIUM PRIORITY ISSUES (X)
+
+[Same format but can be slightly more concise]
+
+---
+
+## ℹ️ LOW PRIORITY ISSUES (X)
+
+[Concise format, optional detailed fixes]
+
+---
+
+## ✅ STRENGTHS & BEST PRACTICES
+
+Your codebase demonstrates **[excellent/good/solid]** engineering practices in these areas:
+
+### ✅ #1: [Strength Title]
+
+**Finding:** [What was done well]
+
+**Evidence:**
+```
+✅ [Evidence point 1]
+✅ [Evidence point 2]
+✅ [Evidence point 3]
+```
+
+**Example from Codebase:**
+
+```language
+// ✅ Excellent example
+[code showing best practice]
+```
+
+**Why This is Excellent:**
+- ✅ **[Benefit 1]** - [Description]
+- ✅ **[Benefit 2]** - [Description]
+
+---
+
+[Repeat for each strength - aim for 5-10 strengths]
+
+---
+
+## 📋 Summary & Priority Roadmap
+
+### Issue Distribution by Severity
+
+| Severity | Count | Must Fix Before Production? |
+|----------|-------|----------------------------|
+| 🚨 **CRITICAL** | X | [✅ NONE / ⚠️ YES] |
+| 🔴 **HIGH** | X | [⚠️ YES / 🟢 RECOMMENDED] |
+| ⚠️ **MEDIUM** | X | [🟢 RECOMMENDED / ℹ️ NICE TO HAVE] |
+| ℹ️ **LOW** | X | [🟢 NICE TO HAVE] |
+| ✅ **STRENGTHS** | X+ | [🎉 EXCELLENT] |
+
+### Overall Code Quality Score
+
+**Security:** [A+/A/B/C/D/F] - [Brief assessment]
+**Performance:** [A+/A/B/C/D/F] - [Brief assessment]
+**Maintainability:** [A+/A/B/C/D/F] - [Brief assessment]
+**Best Practices:** [A+/A/B/C/D/F] - [Brief assessment]
+**Architecture:** [A+/A/B/C/D/F] - [Brief assessment]
+
+**Overall:** **[A+/A/A-/B+/B/C/F]** - [One sentence verdict]
+
+### Priority Fix Order
+
+#### 🚨 IMMEDIATE (Pre-Production Blockers)
+
+| # | Issue | File | Time | Priority |
+|---|-------|------|------|----------|
+| 1 | [Issue Title] | `file.ext:line` | X min | **P0** |
+
+#### 🔴 BEFORE PRODUCTION (Strongly Recommended - ~X Hours Total)
+
+| # | Issue | File | Time | Priority |
+|---|-------|------|------|----------|
+| 1 | [Issue Title] | `file.ext:line` | X min | **P0** |
+
+#### ⚠️ TECHNICAL DEBT (Recommended - ~X Days/Weeks)
+
+| # | Issue | File | Time | Priority |
+|---|-------|------|------|----------|
+| 1 | [Issue Title] | `file.ext:line` | X days | **P1** |
+
+#### ℹ️ NICE TO HAVE (Low Priority)
+
+| # | Issue | Time | Priority |
+|---|-------|------|----------|
+| 1 | [Issue Title] | X days | **P3** |
+
+---
+
+## 🎯 RECOMMENDED IMMEDIATE ACTIONS
+
+### Phase 1: [Phase Name] (X Minutes/Hours - **Do This Now**)
+
+**Objective:** [What this phase achieves]
+
+#### Step 1.1: [Task Name] (X Minutes)
+
+**Task 1.1.1:** [Subtask description] (X minutes)
+
+```language
+// Code changes needed
+```
+
+**Task 1.1.2:** [Subtask description] (X minutes)
+
+```bash
+# Commands to run
+```
+
+[Repeat for each phase]
+
+### Verification Checklist
+
+Before deploying to production, verify:
+
+#### Security
+- [ ] [Security checklist item 1]
+- [ ] [Security checklist item 2]
+
+#### Reliability
+- [ ] [Reliability checklist item 1]
+- [ ] [Reliability checklist item 2]
+
+#### Testing
+- [ ] [Testing checklist item 1]
+- [ ] [Testing checklist item 2]
+
+#### Code Quality
+- [ ] [Code quality checklist item 1]
+- [ ] [Code quality checklist item 2]
+
+---
+
+## 📚 REFERENCES & RESOURCES
+
+### Framework Documentation
+
+**[Framework Name]:**
+- [Link to key documentation]
+- [Link to best practices]
+- [Link to security guidelines]
+
+### Security
+
+**OWASP Guidelines:**
+- [OWASP Top 10](https://owasp.org/www-project-top-ten/)
+- [Relevant OWASP cheat sheets]
+
+### Performance
+
+- [Performance optimization guides]
+- [Profiling tools]
+
+### Best Practices
+
+- [Coding standards]
+- [Architecture patterns]
+- [Testing guidelines]
+
+---
+
+## 🎬 CONCLUSION
+
+### Final Verdict
+
+**Code Quality Grade: [A+/A/A-/B+/B/C/F]** - [One sentence summary]
+
+---
+
+### What's Exceptional ✅
+
+[2-3 paragraphs highlighting the best aspects of the codebase]
+
+1. **[Strength 1]** - [Description]
+2. **[Strength 2]** - [Description]
+3. **[Strength 3]** - [Description]
+
+---
+
+### Critical Gaps ❌
+
+[If any critical issues, list them here with one-line descriptions]
+
+1. **[Issue 1]** - [One sentence] ([X min fix])
+2. **[Issue 2]** - [One sentence] ([X min fix])
+
+---
+
+### Bottom Line
+
+[2-3 paragraphs with final assessment, readiness for production, and next steps]
+
+**Estimated Fix Time:** X hours/days total
+- Critical/high priority fixes: X hours
+- Medium priority improvements: X hours
+- Low priority enhancements: X days
+
+**Recommendation:** [Clear recommendation about production readiness and what must be done]
+
+---
+
+### Next Steps
+
+1. ✅ **[Priority task 1]** - [Time estimate]
+2. ✅ **[Priority task 2]** - [Time estimate]
+3. ✅ **[Priority task 3]** - [Time estimate]
+4. ✅ **[Additional task]** - [Time estimate]
+
+---
+
+**Report Generated:** YYYY-MM-DD HH:MM
+**Analyzer:** Code Reviewer Skill
+**Project:** [Project Name]
+**Total Files Analyzed:** X files
+**Total Lines Analyzed:** X lines
+
+---
+
+*This report was generated by the Code Reviewer skill, analyzing code for security vulnerabilities, performance issues, code quality problems, and adherence to best practices and framework conventions.*
+
+---
+
+## 📌 APPENDIX: Issue Quick Reference
+
+### Quick Links to Issues
+
+**CRITICAL PRIORITY (Must Fix Immediately):**
+- [CRITICAL #1: Issue Title](#-critical-1-issue-title) - X min
+
+**HIGH PRIORITY (Must Fix Before Production):**
+- [HIGH #1: Issue Title](#-high-1-issue-title) - X min
+- [HIGH #2: Issue Title](#-high-2-issue-title) - X min
+
+**MEDIUM PRIORITY (Technical Debt):**
+- [MEDIUM #1: Issue Title](#️-medium-1-issue-title) - X min
+
+**LOW PRIORITY (Nice to Have):**
+- [LOW #1: Issue Title](#️-low-1-issue-title) - X days
+
+### File Locations Quick Reference
+
+```
+CRITICAL/HIGH PRIORITY FILES TO FIX:
+├── path/to/file1.ext:line
+├── path/to/file2.ext:line
+└── path/to/file3.ext:line
+
+MEDIUM PRIORITY FILES:
+├── path/to/file4.ext:line
+└── path/to/file5.ext:line
+
+CONFIGURATION FILES TO UPDATE:
+├── config/file1.conf
+└── config/file2.json
+```
+
+---
+
+**End of Report**
+```
+
+#### 4.3 Report Generation Workflow
+
+After completing the analysis:
+
+1. **Collect all findings** - Organize by severity
+2. **Count statistics** - Files reviewed, lines changed, issues by severity
+3. **Generate filename** - Based on review type and date
+4. **Write report file** - Use Write tool to create the markdown file
+5. **Inform user** - Tell user the report file path and location
+
+**Example:**
+
+```bash
+# After analysis is complete, generate report
+REPORT_FILE="CODE-REVIEW-REPORT-2025-01-13.md"
+
+# Use Write tool to create the report
+# (populate with all findings organized by the structure above)
+
+# Inform user
+echo "✅ Code review complete!"
+echo "📄 Report saved to: ${REPORT_FILE}"
+echo ""
+echo "Summary:"
+echo "- Critical Issues: X"
+echo "- High Priority: X"
+echo "- Medium Priority: X"
+echo "- Low Priority: X"
+echo "- Strengths Identified: X+"
+echo ""
+echo "Overall Grade: A-"
+echo "Recommendation: [Verdict]"
 ```
 
 ## Review Guidelines
@@ -285,10 +675,44 @@ For auto-generated code (migrations, builds, etc):
 ## Integration with Development Workflow
 
 After completing the review:
-1. Provide clear verdict: LGTM | Needs Changes | Blocked
-2. Highlight most critical items
-3. Offer to create GitHub issues for tracked items
-4. Suggest follow-up reviews if needed
+
+1. **Generate comprehensive report file** - Always create a markdown report
+2. **Provide user summary** - Show key findings in terminal
+3. **Clear verdict** - LGTM | Needs Changes | Blocked
+4. **Highlight critical items** - Call out must-fix issues
+5. **Report location** - Tell user where report was saved
+6. **Offer next steps** - Create GitHub issues, follow-up reviews, etc.
+
+**User Communication Template:**
+
+```
+✅ Code review complete!
+📄 Report saved to: CODE-REVIEW-REPORT-2025-01-13.md
+
+📊 Summary:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Files Reviewed: X files
+Lines Changed: +XXX -XXX
+Issues Found: X total
+
+🚨 Critical: X (Must fix immediately)
+🔴 High: X (Fix before production)
+⚠️ Medium: X (Technical debt)
+ℹ️ Low: X (Nice to have)
+✅ Strengths: X+ best practices identified
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Overall Grade: [A+/A/A-/B+/B/C/F]
+Verdict: [LGTM / Needs Changes / Blocked]
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[If issues found:]
+⚠️ Top Priority Items:
+1. [Issue title] - file.ext:line (X min fix)
+2. [Issue title] - file.ext:line (X min fix)
+
+📖 Full details in the report file.
+```
 
 ## Progressive Disclosure
 

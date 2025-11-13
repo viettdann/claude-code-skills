@@ -40,6 +40,24 @@ Supports code review for:
 - Go
 - And more...
 
+### Automatic Report Generation
+
+**NEW**: The skill automatically generates comprehensive markdown reports for every review!
+
+**Features:**
+- **Detailed documentation** - Complete review saved as markdown file
+- **Professional format** - Executive summary, severity-classified issues, actionable fixes
+- **Persistent reference** - Keep reports for audit trail and tracking progress
+- **Shareable** - Easy to share with team or include in PR discussions
+- **Comprehensive structure** - Includes Quick Stats, Priority Roadmap, Immediate Actions
+
+**Report Files:**
+- `CODE-REVIEW-REPORT-2025-01-13.md` (general reviews)
+- `CODE-REVIEW-REPORT-abc1234-2025-01-13.md` (commit-specific)
+- `SECURITY-AUDIT-REPORT-2025-01-13.md` (security-focused)
+
+See [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md) for the complete report structure.
+
 ## Usage
 
 ### Basic Usage
@@ -84,17 +102,31 @@ Review this code for React best practices
 
 ## Review Output
 
+### Report File Generation
+
+**The skill automatically creates a comprehensive markdown report file for every review.**
+
+The report is saved in your project root with a filename like:
+- `CODE-REVIEW-REPORT-2025-01-13.md`
+- `CODE-REVIEW-REPORT-abc1234-2025-01-13.md` (for commit reviews)
+- `SECURITY-AUDIT-REPORT-2025-01-13.md` (for security audits)
+
 ### Report Structure
 
-Each review includes:
+Each generated report includes:
 
-1. **Summary**: Files reviewed, lines changed, issues count
-2. **Critical Issues**: Security vulnerabilities, blockers
-3. **High Priority Issues**: Bugs, major problems
-4. **Medium Priority Issues**: Code quality improvements
-5. **Low Priority Issues**: Style suggestions
-6. **Positive Observations**: Things done well
-7. **Recommendations**: Actionable next steps
+1. **📊 Executive Summary**: Overall assessment, grade, key highlights
+2. **📋 Quick Stats Table**: Security, Performance, Code Quality status
+3. **🚨 Critical Issues**: Security vulnerabilities, must-fix blockers
+4. **🔴 High Priority Issues**: Bugs, major problems, architectural violations
+5. **⚠️ Medium Priority Issues**: Code quality improvements, technical debt
+6. **ℹ️ Low Priority Issues**: Style suggestions, minor optimizations
+7. **✅ Strengths & Best Practices**: What the code does well (5-10 examples)
+8. **📋 Summary & Priority Roadmap**: Issue distribution, fix order, time estimates
+9. **🎯 Recommended Immediate Actions**: Step-by-step fix guide with code
+10. **📚 References & Resources**: Links to documentation, OWASP, framework guides
+11. **🎬 Conclusion**: Final verdict, production readiness, next steps
+12. **📌 Appendix**: Quick reference links to all issues
 
 ### Issue Format
 

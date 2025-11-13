@@ -4,12 +4,200 @@ This document provides real-world examples of using the Code Reviewer skill for 
 
 ## Table of Contents
 
-1. [Basic Usage](#basic-usage)
-2. [Security-Focused Reviews](#security-focused-reviews)
-3. [Framework-Specific Reviews](#framework-specific-reviews)
-4. [Merge Commit Reviews](#merge-commit-reviews)
-5. [Performance Reviews](#performance-reviews)
-6. [Incremental Reviews](#incremental-reviews)
+1. [Automatic Report Generation](#automatic-report-generation)
+2. [Basic Usage](#basic-usage)
+3. [Security-Focused Reviews](#security-focused-reviews)
+4. [Framework-Specific Reviews](#framework-specific-reviews)
+5. [Merge Commit Reviews](#merge-commit-reviews)
+6. [Performance Reviews](#performance-reviews)
+7. [Incremental Reviews](#incremental-reviews)
+
+---
+
+## Automatic Report Generation
+
+**NEW**: The Code Reviewer skill now automatically generates comprehensive markdown reports for every review!
+
+### Example: Report Generation Output
+
+**User Request:**
+```
+Review my latest commit
+```
+
+**Terminal Output (User sees this):**
+
+```
+🔍 Analyzing code changes...
+
+Checking commit: abc1234 - Add user authentication endpoint
+Files changed: 2 files (+57 lines)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Analyzing security vulnerabilities...
+  ✓ Checked SQL injection patterns
+  ✗ Found 1 critical issue
+
+Analyzing code quality...
+  ✓ Checked error handling
+  ✓ Checked async patterns
+  ✗ Found 1 high priority issue
+
+Analyzing best practices...
+  ✗ Found 1 medium priority issue
+  ✓ Identified 3 strengths
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Code review complete!
+📄 Report saved to: CODE-REVIEW-REPORT-abc1234-2025-01-13.md
+
+📊 Summary:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Files Reviewed: 2 files
+Lines Changed: +57 -0
+Issues Found: 3 total
+
+🚨 Critical: 1 (Must fix immediately)
+🔴 High: 1 (Fix before production)
+⚠️ Medium: 1 (Technical debt)
+ℹ️ Low: 0
+✅ Strengths: 3 best practices identified
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Overall Grade: B+
+Verdict: Needs Changes - Fix critical issue before merge
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ Top Priority Items:
+1. SQL Injection Vulnerability - src/api/auth.ts:23 (5 min fix)
+2. Missing Password Hashing - src/api/auth.ts:34 (10 min fix)
+
+📖 Full details in the report file.
+
+Next steps:
+1. Open CODE-REVIEW-REPORT-abc1234-2025-01-13.md to see detailed findings
+2. Fix critical SQL injection issue immediately
+3. Implement password hashing before deploying
+```
+
+**Generated Report File** (`CODE-REVIEW-REPORT-abc1234-2025-01-13.md`):
+
+```markdown
+# 🔍 MyApp Code Review Report
+
+**Project:** MyApp
+**Framework:** Node.js with Express
+**Language:** TypeScript
+**Analysis Date:** 2025-01-13
+**Analyzed By:** Code Reviewer Skill
+**Commit:** abc1234 - Add user authentication endpoint
+
+---
+
+## 📊 Executive Summary
+
+### Overall Assessment: **B+ (Good with Security Concerns)**
+
+This commit adds user authentication functionality to the API. While the implementation demonstrates good TypeScript usage and follows Express best practices, there is **1 critical security vulnerability (SQL injection)** and **1 high priority issue (password storage)** that must be addressed before deploying to production.
+
+**Key Highlights:**
+- ✅ Clean TypeScript with proper type definitions
+- ✅ Good async/await patterns throughout
+- ✅ Proper error handling structure
+- 🚨 **Critical SQL injection vulnerability** requiring immediate fix
+- 🔴 **Passwords stored in plain text** - must implement hashing
+
+### Quick Stats
+
+| Category | Status |
+|----------|--------|
+| Security | 🔴 Critical Issues - SQL injection, no password hashing |
+| Code Quality | ✅ Excellent - Clean code, good patterns |
+| Performance | ✅ Excellent - Proper async, no obvious issues |
+| Best Practices | ⚠️ Good - Missing input validation |
+| Test Coverage | N/A - No tests in this commit |
+
+---
+
+## Table of Contents
+
+1. [Critical Issues](#critical-issues) (1)
+2. [High Priority Issues](#high-priority-issues) (1)
+3. [Medium Priority Issues](#medium-priority-issues) (1)
+4. [Low Priority Issues](#low-priority-issues) (0)
+5. [Strengths & Best Practices](#strengths--best-practices) (3)
+6. [Summary & Priority Roadmap](#summary--priority-roadmap)
+7. [Recommended Immediate Actions](#recommended-immediate-actions)
+8. [References & Resources](#references--resources)
+
+---
+
+## 🚨 CRITICAL ISSUES (1)
+
+### 🚨 CRITICAL #1: SQL Injection Vulnerability
+
+**Location:** `src/api/auth.ts:23`
+**Severity:** CRITICAL
+**Category:** Security
+**Estimated Fix Time:** 5 minutes
+
+#### Problem
+
+User input (`email`) is directly concatenated into SQL query without sanitization or parameterization, allowing attackers to execute arbitrary SQL commands.
+
+#### Impact
+
+- 🔴 **Complete database compromise** - Attackers can read, modify, or delete all data
+- 🔴 **Authentication bypass** - Attackers can login as any user
+- 🔴 **Data breach** - User credentials and sensitive data exposed
+
+[... rest of the detailed issue ...]
+
+---
+
+[... complete report with all sections ...]
+```
+
+### What Gets Generated
+
+The skill creates a comprehensive report including:
+
+1. **Executive Summary** - Grade, key findings, quick stats table
+2. **All Issues** - Detailed analysis with code examples and fixes
+3. **Strengths** - What the code does well
+4. **Priority Roadmap** - Time estimates, fix order
+5. **Immediate Actions** - Step-by-step fix guide
+6. **References** - Links to documentation
+7. **Conclusion** - Production readiness assessment
+
+### Report Benefits
+
+**For Developers:**
+- Detailed reference to work through fixes systematically
+- Learn from strengths identified in their code
+- Time estimates help with planning
+- Code examples show exactly what to change
+
+**For Teams:**
+- Shareable documentation for PR discussions
+- Audit trail of code quality over time
+- Training material for junior developers
+- Evidence of due diligence for compliance
+
+**For Managers:**
+- Clear production readiness assessment
+- Prioritized fix lists with time estimates
+- Quality metrics across the codebase
+- Track improvement over time
+
+### Customizing Reports
+
+The skill automatically adjusts report content based on:
+- **Review type**: Commit review vs full codebase audit
+- **Severity of findings**: More detail for critical issues
+- **Framework detected**: Framework-specific references and patterns
+- **Scope**: Focused reports for specific files vs comprehensive reviews
 
 ---
 
