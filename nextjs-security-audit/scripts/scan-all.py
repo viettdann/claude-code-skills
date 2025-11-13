@@ -89,6 +89,7 @@ class SecurityScanner:
             ('Secrets Scanner', 'scan-secrets.sh'),
             ('Server Actions', 'scan-server-actions.sh'),
             ('Type Safety', 'scan-type-safety.py'),
+            ('Quick Heuristics', 'scan-quick.py'),
         ]
 
         print(f"{Colors.BOLD}🔒 Security Scan Suite{Colors.NC}")

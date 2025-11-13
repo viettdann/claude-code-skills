@@ -139,6 +139,211 @@ Grep patterns:
 - CSRF vulnerabilities (missing revalidation)
 - Direct database mutations without sanitization
 
+### 8. SSRF (Server-Side Request Forgery)
+```
+Grep patterns:
+- "fetch\(.*(req\.query|req\.body|params|searchParams|URLSearchParams)\.(get|\[)"
+- "axios\.(get|post|put|delete)\(.*(req\.query|req\.body|params|searchParams)"
+- "new URL\(.*(req\.query|req\.body|params|searchParams)"
+```
+
+**Check for:**
+- User-controlled URLs used in server-side HTTP calls without allowlist
+- Missing hostname/protocol validation (only http/https)
+- Access to internal addresses (e.g., 127.0.0.1, localhost, 169.254.169.254)
+- Proxy/gateway functions that could reach internal services
+
+**Mitigation:**
+- Maintain an allowlist of domains, validate protocol, block private IP ranges
+- Use URL parsing with strict checks; reject redirects to unapproved hosts
+
+### 9. Path Traversal & Unsafe File Access
+```
+Grep patterns:
+- "fs\.(readFile|createReadStream|writeFile|unlink|readdir)\("
+- "path\.(join|resolve)\("
+- "(multer|busboy|formidable|FormData)"
+```
+
+**Check for:**
+- User-supplied paths or filenames used in file operations
+- Missing normalization/allowlisting of upload destinations
+- Writing/reading outside intended directories (../../)
+- Accepting arbitrary file types without MIME validation and size limits
+
+**Mitigation:**
+- Normalize with path.resolve and enforce base directory, reject ".." segments
+- Validate file type, size, and storage path; prefer presigned URLs for cloud storage
+
+### 10. Open Redirects
+```
+Grep patterns:
+- "redirect\(.*(searchParams|get|query|body)"
+- "NextResponse\.redirect\("
+- "res\.redirect\("
+```
+
+**Check for:**
+- Redirect destination built from user input (e.g., returnTo, next, dest)
+- Missing same-origin or allowlist checks on redirect URLs
+
+**Mitigation:**
+- Enforce same-origin or a fixed allowlist; map known keys to internal routes only
+
+### 11. CORS Misconfiguration
+```
+Grep patterns:
+- "Access-Control-Allow-Origin\s*:\s*\*"
+- "NextResponse\.(json|redirect|rewrite).*headers"
+- "new Response\(.*headers" 
+- "cors\("  # If using a CORS library
+```
+
+**Check for:**
+- "*" on sensitive endpoints that use cookies or auth
+- Missing Access-Control-Allow-Credentials when cookies are needed
+- Overly broad allowed methods/headers
+
+**Mitigation:**
+- Restrict origins per environment; credentials only for trusted origins
+- Keep methods/headers minimal; prefer preflight validation in middleware
+
+### 12. Security Headers & Content Security Policy (CSP)
+```
+Grep patterns:
+- "next\.config\.js"
+- "headers\(\)"  # Next.js headers API
+- "Content-Security-Policy|X-Frame-Options|X-Content-Type-Options|Referrer-Policy|Strict-Transport-Security|Permissions-Policy"
+```
+
+**Check for:**
+- Missing core headers
+- CSP with unsafe-inline scripts/styles or overly permissive img/media/connect-src
+
+**Recommended minimal headers:**
+- X-Frame-Options: DENY or frame-ancestors 'none' in CSP
+- X-Content-Type-Options: nosniff
+- Referrer-Policy: no-referrer
+- Strict-Transport-Security: max-age=31536000; includeSubDomains; preload (HTTPS only)
+- Permissions-Policy: restrict camera/microphone/geolocation as needed
+- CSP: default-src 'self'; script-src 'self' 'nonce-...'; style-src 'self' 'nonce-...' 'unsafe-inline' only if necessary; connect-src restricted
+
+### 13. Cookie & Session Security (NextAuth and custom auth)
+```
+Grep patterns:
+- "next-auth"
+- "getServerSession|getSession"
+- "NextResponse\.cookies|setCookie|cookies\(" 
+- "NEXTAUTH_SECRET|NEXTAUTH_URL"
+```
+
+**Check for:**
+- Cookies without httpOnly, secure, sameSite=lax/strict
+- Session validation only on client side; missing server-side guards
+- NEXTAUTH_SECRET/NEXTAUTH_URL misconfigured or exposed to client
+- JWT session tokens logged or sent to client unintentionally
+
+**Mitigation:**
+- Set secure cookie flags; verify session on server boundaries; avoid exposing secrets
+
+### 14. Webhook Signature Verification
+```
+Grep patterns:
+- "Stripe-Signature|svix|x-hub-signature|x-github-event"
+- "stripe\("|"@stripe/stripe-js|@stripe/stripe-node"
+- "crypto\.createHmac|verifySignature|verifyWebhook"
+```
+
+**Check for:**
+- Route handlers receiving webhooks without signature verification
+- Stripe endpoints not using raw body and constructEvent
+- Secrets handled in client code
+
+**Mitigation:**
+- Verify webhook signatures server-side; use raw body when required; store secrets server-only
+
+### 15. Exposed Environment Variables
+```
+Grep patterns:
+- "process\.env\.NEXT_PUBLIC_.*(KEY|SECRET|TOKEN|PASSWORD)"
+- "'use client'[\s\S]*process\.env\."
+- "publicRuntimeConfig|serverRuntimeConfig"  # next/config usage
+```
+
+**Check for:**
+- Secrets placed under NEXT_PUBLIC_* or referenced in client components
+- Misuse of next/config exposing sensitive values
+
+**Mitigation:**
+- Keep secrets server-only; use server-only module; never access env in client components
+
+### 16. Logging Sensitive Data
+```
+Grep patterns:
+- "console\.log\(.*(token|password|secret|api[_-]?key|authorization|cookie|set-cookie|bearer)"
+- "logger\.(info|debug)\(.*(token|secret|password)"
+```
+
+**Check for:**
+- Logging of auth headers, cookies, tokens, or PII in server logs
+
+**Mitigation:**
+- Redact sensitive values; use structured logging with allowlist fields
+
+### 17. Rate Limiting & Abuse Prevention
+```
+Grep patterns:
+- "ratelimit|rateLimit|Upstash|Bottleneck|express-rate-limit"
+- "export async function (POST|PUT|DELETE)"  # Potentially sensitive mutations
+```
+
+**Check for:**
+- Sensitive endpoints without rate limits or abuse checks
+
+**Mitigation:**
+- Apply per-IP/user rate limits in middleware/route handlers; add captcha for high-risk flows
+
+### 18. GraphQL Hardening (if used)
+```
+Grep patterns:
+- "graphql|ApolloServer|graphql-yoga|gql\("
+- "introspection"|"validationRules"
+```
+
+**Check for:**
+- No input validation on resolvers; unlimited query depth/complexity
+- Introspection enabled in production
+
+**Mitigation:**
+- Add schema validation, depth/complexity limits, disable introspection in prod
+
+### 19. Privacy-aware Caching & Revalidation
+```
+Grep patterns:
+- "fetch\(.*\{[\s\S]*cache:\s*'force-cache'|next:\s*\{[\s\S]*revalidate:" 
+- "cookies\(\)|headers\(\)"  # Personalized responses
+```
+
+**Check for:**
+- Caching personalized pages or API responses containing PII
+
+**Mitigation:**
+- Use cache: 'no-store' for personalized content; revalidate only for public data; ensure Vary headers
+
+### 20. next/image & Remote Assets
+```
+Grep patterns:
+- "next/image"
+- "images:\s*\{[\s\S]*domains:"  # next.config.js
+```
+
+**Check for:**
+- Loading images/scripts from untrusted domains
+- Missing domain allowlist for images
+
+**Mitigation:**
+- Restrict images.domains; sanitize any user-supplied URLs
+
 ## Next.js 2025 Best Practices
 
 ### 1. Server vs Client Component Misuse

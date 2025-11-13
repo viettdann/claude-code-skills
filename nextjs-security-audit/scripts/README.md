@@ -12,6 +12,7 @@ Standalone security scanning tools that work independently or alongside the Clau
 ./scripts/scan-secrets.sh
 ./scripts/scan-server-actions.sh
 ./scripts/scan-type-safety.py
+./scripts/scan-quick.py
 ```
 
 ## Prerequisites
@@ -242,6 +243,7 @@ Add to `package.json`:
 {
   "scripts": {
     "security:scan": "./scripts/scan-all.py",
+    "security:quick": "./scripts/scan-quick.py",
     "security:secrets": "./scripts/scan-secrets.sh",
     "security:actions": "./scripts/scan-server-actions.sh",
     "security:types": "./scripts/scan-type-safety.py"
@@ -465,3 +467,69 @@ To add a new scanner:
 ## License
 
 MIT - Use freely in your projects
+
+---
+
+## Additional Quick-Scan Commands (Heuristics)
+
+These commands can be run with ripgrep to pre-flag potential issues. Always confirm by reading code in context. Exclude node_modules and generated code; respect .gitignore.
+
+1) SSRF
+```bash
+rg -n --no-ignore --hidden -g '!node_modules/**' -e "fetch\(.*(req\.query|req\.body|params|searchParams|URLSearchParams)\.(get|\[)" -e "axios\.(get|post|put|delete)\(.*(req\.query|req\.body|params|searchParams)" -e "new URL\(.*(req\.query|req\.body|params|searchParams)" .
+```
+
+2) Path traversal & unsafe file access
+```bash
+rg -n --no-ignore --hidden -g '!node_modules/**' -e "fs\.(readFile|createReadStream|writeFile|unlink|readdir)\(" -e "path\.(join|resolve)\(" -e "(multer|busboy|formidable|FormData)" .
+```
+
+3) Open redirect
+```bash
+rg -n --no-ignore --hidden -g '!node_modules/**' -e "redirect\(.*(searchParams|get|query|body)" -e "NextResponse\.redirect\(" -e "res\.redirect\(" .
+```
+
+4) CORS misconfiguration
+```bash
+rg -n --no-ignore --hidden -g '!node_modules/**' -e "Access-Control-Allow-Origin\s*:\s*\*" -e "NextResponse\.(json|redirect|rewrite).*headers" -e "new Response\(.*headers" -e "cors\(" .
+```
+
+5) Security headers & CSP
+```bash
+rg -n --no-ignore --hidden -g '!node_modules/**' -e "Content-Security-Policy|X-Frame-Options|X-Content-Type-Options|Referrer-Policy|Strict-Transport-Security|Permissions-Policy" -e "headers\(\)" -e "next\.config\.js" .
+```
+
+6) Cookie & session flags (NextAuth/custom)
+```bash
+rg -n --no-ignore --hidden -g '!node_modules/**' -e "cookies\(|setCookie|NextResponse\.cookies" -e "next-auth" -e "getServerSession|getSession" .
+```
+
+7) Webhook signature verification
+```bash
+rg -n --no-ignore --hidden -g '!node_modules/**' -e "Stripe-Signature|svix|x-hub-signature|x-github-event" -e "stripe\(" -e "@stripe/stripe-node|@stripe/stripe-js" -e "crypto\.createHmac|verifySignature|verifyWebhook" .
+```
+
+8) Exposed environment variables in client code
+```bash
+rg -n --no-ignore --hidden -g '!node_modules/**' -e "process\.env\.NEXT_PUBLIC_.*(KEY|SECRET|TOKEN|PASSWORD)" -e "'use client'[\s\S]*process\.env\." -e "publicRuntimeConfig|serverRuntimeConfig" .
+```
+
+9) Logging sensitive data
+```bash
+rg -n --no-ignore --hidden -g '!node_modules/**' -e "console\.log\(.*(token|password|secret|api[_-]?key|authorization|cookie|set-cookie|bearer)" -e "logger\.(info|debug)\(.*(token|secret|password)" .
+```
+
+10) Rate limiting presence on mutation endpoints
+```bash
+rg -n --no-ignore --hidden -g '!node_modules/**' -e "ratelimit|rateLimit|Upstash|Bottleneck|express-rate-limit" -e "export async function (POST|PUT|DELETE)" app/**/route\.(ts|js|tsx)
+```
+
+11) Privacy-aware caching & revalidation
+```bash
+rg -n --no-ignore --hidden -g '!node_modules/**' -e "fetch\(.*\{[\s\S]*cache:\s*'force-cache'|next:\s*\{[\s\S]*revalidate:" -e "cookies\(\)|headers\(\)" .
+```
+
+12) next/image remote domains
+```bash
+rg -n --no-ignore --hidden -g '!node_modules/**' -e "next/image" -e "images:\s*\{[\s\S]*domains:" next.config.js
+```
