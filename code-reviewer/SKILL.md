@@ -580,6 +580,69 @@ echo "Overall Grade: A-"
 echo "Recommendation: [Verdict]"
 ```
 
+### 5. Generate JSON Output
+
+**IMPORTANT**: In addition to the markdown report, ALWAYS generate a JSON output file.
+
+After generating the markdown report, create a JSON file:
+
+```bash
+# Generate JSON filename
+JSON_FILE="${REPORT_FILE%.md}.json"
+
+# Example: CODE-REVIEW-REPORT-2025-01-13.json
+```
+
+#### 5.1 JSON Structure
+
+Follow the complete schema defined in [SCHEMA.md](SCHEMA.md).
+
+**Key sections:**
+- `metadata` - Project, commit, timestamps
+- `summary` - Grade, verdict, issue counts, productionReady flag
+- `issues[]` - File, line, severity, description, fix
+- `strengths[]` - Best practices identified
+- `files[]` - Per-file status
+- `metrics` - Quality scores
+
+**Important:** Generate **compact JSON** (no pretty-printing) to minimize file size.
+
+#### 5.2 Generation Workflow
+
+```bash
+# After completing analysis and generating markdown report
+
+# 1. Collect metadata
+REPORT_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+COMMIT_SHA=$(git log -1 --format=%h)
+PROJECT_NAME=$(basename $(git rev-parse --show-toplevel))
+
+# 2. Generate JSON filename
+JSON_FILE="CODE-REVIEW-REPORT-${COMMIT_SHA}-$(date +%Y-%m-%d).json"
+
+# 3. Use Write tool to create COMPACT JSON (no pretty-printing)
+# Populate with all findings organized according to schema
+
+# 4. VALIDATE JSON with jq (quick check)
+if command -v jq &> /dev/null; then
+  if jq empty "$JSON_FILE" 2>/dev/null; then
+    echo "✓ JSON validation passed"
+  else
+    echo "✗ JSON validation FAILED - file may be invalid"
+  fi
+fi
+
+# 5. Inform user
+echo "✅ Code review complete!"
+echo "📄 Markdown report: ${REPORT_FILE}"
+echo "📊 JSON output: ${JSON_FILE}"
+```
+
+**Notes:**
+- Generate **compact JSON** (single-line, no indentation) for minimal file size
+- Validate with `jq` if available - fails fast if JSON is malformed
+- JSON can be used for PR automation, CI/CD integration, or custom tooling
+
 ## Review Guidelines
 
 ### Be Constructive
@@ -681,13 +744,15 @@ After completing the review:
 3. **Clear verdict** - LGTM | Needs Changes | Blocked
 4. **Highlight critical items** - Call out must-fix issues
 5. **Report location** - Tell user where report was saved
-6. **Offer next steps** - Create GitHub issues, follow-up reviews, etc.
+6. **Offer next steps** - Create issues, follow-up reviews, etc.
 
 **User Communication Template:**
 
 ```
 ✅ Code review complete!
-📄 Report saved to: CODE-REVIEW-REPORT-2025-01-13.md
+📄 Markdown report: CODE-REVIEW-REPORT-2025-01-13.md
+📊 JSON output: CODE-REVIEW-REPORT-2025-01-13.json
+✓ JSON validation passed
 
 📊 Summary:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

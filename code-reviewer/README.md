@@ -58,6 +58,31 @@ Supports code review for:
 
 See [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md) for the complete report structure.
 
+### JSON/YAML Output for PR Automation
+
+**NEW**: The skill also generates machine-readable JSON output alongside markdown reports!
+
+**What's Generated:**
+- `CODE-REVIEW-REPORT-2025-01-13.md` (human-readable markdown)
+- `CODE-REVIEW-REPORT-2025-01-13.json` (machine-readable JSON)
+
+**Use Cases:**
+- **Automated PR Comments** - Post inline comments on specific lines of code
+- **CI/CD Integration** - Block merges based on severity or production readiness
+- **Custom Dashboards** - Track code quality metrics over time
+- **AI Review Bots** - Build GitHub/GitLab bots that act like human reviewers
+
+**JSON Includes:**
+- Complete issue details with file paths and line numbers
+- Severity levels, priorities, and time estimates
+- Recommended fixes with code examples
+- Production readiness flag for merge gates
+- Metrics and grades for tracking trends
+
+**Documentation:**
+- See [scripts/README.md](scripts/README.md) for JSON structure details
+- See [SCHEMA.md](SCHEMA.md) for complete JSON schema
+
 ## Usage
 
 ### Basic Usage
