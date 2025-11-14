@@ -52,9 +52,9 @@ Supports code review for:
 - **Comprehensive structure** - Includes Quick Stats, Priority Roadmap, Immediate Actions
 
 **Report Filenames:**
-- `CODE-REVIEW-REPORT-2025-01-13.md` (general reviews, no commit)
-- `CODE-REVIEW-REPORT-2025-01-13-abc1234.md` (commit-specific reviews)
-- `SECURITY-AUDIT-REPORT-2025-01-13.md` (security-focused audits)
+- `CODE-REVIEW-REPORT-2025-11-14.md` (general reviews, no commit)
+- `CODE-REVIEW-REPORT-2025-11-14-[commit-hash].md` (commit-specific reviews)
+- `SECURITY-AUDIT-REPORT-2025-11-14.md` (security-focused audits)
 
 See [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md) for complete report structure.
 
@@ -63,8 +63,8 @@ See [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md) for complete report structure.
 **NEW**: Skill generates machine-readable JSON output alongside markdown reports.
 
 **Generated Files:**
-- `CODE-REVIEW-REPORT-2025-01-13.md` (human-readable markdown)
-- `CODE-REVIEW-REPORT-2025-01-13.json` (machine-readable JSON, compact format)
+- `CODE-REVIEW-REPORT-2025-11-14.md` (human-readable markdown)
+- `CODE-REVIEW-REPORT-2025-11-14.json` (machine-readable JSON, compact format)
 
 **Use Cases:**
 - **Automated PR Comments** - Post inline comments on specific lines of code
@@ -132,9 +132,9 @@ Review this code for React best practices
 Skill automatically creates comprehensive markdown report file for every review.
 
 Report saved in project root with filename format:
-- `CODE-REVIEW-REPORT-2025-01-13.md` (general reviews)
-- `CODE-REVIEW-REPORT-2025-01-13-abc1234.md` (commit-specific reviews)
-- `SECURITY-AUDIT-REPORT-2025-01-13.md` (security audits)
+- `CODE-REVIEW-REPORT-2025-11-14.md` (general reviews)
+- `CODE-REVIEW-REPORT-2025-11-14-[commit-hash].md` (commit-specific reviews)
+- `SECURITY-AUDIT-REPORT-2025-11-14.md` (security audits)
 
 ### Report Structure
 

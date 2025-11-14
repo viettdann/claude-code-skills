@@ -50,7 +50,7 @@ Analyzing best practices...
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ✅ Code review complete!
-📄 Report saved to: CODE-REVIEW-REPORT-abc1234-2025-01-13.md
+📄 Report saved to: CODE-REVIEW-REPORT-2025-11-14-[commit-hash].md
 
 📊 Summary:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -76,12 +76,14 @@ Verdict: Needs Changes - Fix critical issue before merge
 📖 Full details in the report file.
 
 Next steps:
-1. Open CODE-REVIEW-REPORT-abc1234-2025-01-13.md to see detailed findings
+1. Open CODE-REVIEW-REPORT-2025-11-14-[commit-hash].md to see detailed findings
 2. Fix critical SQL injection issue immediately
 3. Implement password hashing before deploying
 ```
 
-**Generated Report File** (`CODE-REVIEW-REPORT-abc1234-2025-01-13.md`):
+**Note**: JSON output only generated when explicitly requested (e.g., "review and generate JSON").
+
+**Generated Report File** (`CODE-REVIEW-REPORT-2025-11-14-[commit-hash].md`):
 
 ```markdown
 # 🔍 MyApp Code Review Report
@@ -89,7 +91,7 @@ Next steps:
 **Project:** MyApp
 **Framework:** Node.js with Express
 **Language:** TypeScript
-**Analysis Date:** 2025-01-13
+**Analysis Date:** 2025-11-14
 **Analyzed By:** Code Reviewer Skill
 **Commit:** abc1234 - Add user authentication endpoint
 
@@ -145,13 +147,24 @@ This commit adds user authentication functionality to the API. While the impleme
 
 User input (`email`) is directly concatenated into SQL query without sanitization or parameterization, allowing attackers to execute arbitrary SQL commands.
 
+```typescript
+const query = `SELECT * FROM users WHERE email = '${email}'`;
+const user = await db.execute(query);
+```
+
 #### Impact
 
 - 🔴 **Complete database compromise** - Attackers can read, modify, or delete all data
 - 🔴 **Authentication bypass** - Attackers can login as any user
 - 🔴 **Data breach** - User credentials and sensitive data exposed
 
-[... rest of the detailed issue ...]
+#### Recommendation
+
+Use parameterized queries to prevent SQL injection. See OWASP SQL Injection Prevention Cheat Sheet.
+
+**References**:
+- https://owasp.org/www-community/attacks/SQL_Injection
+- https://cheatsheetseries.owasp.org/cheatsheets/SQL_Injection_Prevention_Cheat_Sheet.html
 
 ---
 
@@ -804,6 +817,12 @@ git commit -m "Final changes"
 ```
 # When performance matters
 "Review my database queries for performance issues"
+```
+
+**JSON Output Request:**
+```
+# When CI/CD integration needed
+"Review my latest commit and generate JSON output"
 ```
 
 ---

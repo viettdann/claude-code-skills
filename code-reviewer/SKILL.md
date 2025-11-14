@@ -153,9 +153,9 @@ REVIEW_DATE=$(date +%Y-%m-%d)
 ```
 
 **Examples:**
-- `CODE-REVIEW-REPORT-2025-01-13.md` (general review)
-- `CODE-REVIEW-REPORT-2025-01-13-abc1234.md` (commit review)
-- `SECURITY-AUDIT-REPORT-2025-01-13.md` (security audit)
+- `CODE-REVIEW-REPORT-2025-11-14.md` (general review)
+- `CODE-REVIEW-REPORT-2025-11-14-[commit-hash].md` (commit review)
+- `SECURITY-AUDIT-REPORT-2025-11-14.md` (security audit)
 
 #### 4.2 Report Structure
 
@@ -173,10 +173,11 @@ Generate a comprehensive markdown report following the complete structure define
 
 **Key principles:**
 - **Be specific**: Include file paths with line numbers (`path/to/file.ext:123`)
-- **Show code examples**: Use ❌ Before / ✅ After format
-- **Provide fixes**: Include step-by-step remediation
+- **Identify issues clearly**: Point out what's wrong and why it's problematic
+- **Minimal fix guidance**: Suggest approach/direction, not full implementations
 - **Reference docs**: Link to official framework documentation
 - **NO time estimates**: Do not include fix time estimates - this is a review, not a plan
+- **Reviewer mindset**: Point out problems, not guide through solutions
 
 See [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md) for the complete template structure.
 
@@ -194,7 +195,7 @@ After completing the analysis:
 
 ```bash
 # After analysis is complete, generate report
-REPORT_FILE="CODE-REVIEW-REPORT-2025-01-13.md"
+REPORT_FILE="CODE-REVIEW-REPORT-2025-11-14.md"
 
 # Use Write tool to create the report
 # (populate with all findings organized by the structure above)
@@ -214,11 +215,13 @@ echo "Overall Grade: A-"
 echo "Recommendation: [Verdict]"
 ```
 
-### 5. Generate JSON Output
+### 5. Generate JSON Output (Optional)
 
-**IMPORTANT**: In addition to the markdown report, ALWAYS generate a JSON output file.
+**IMPORTANT**: Generate JSON output **ONLY when user explicitly requests it** (e.g., "generate JSON report", "I need JSON output", "export as JSON").
 
-After generating the markdown report, create a JSON file:
+**By default:** Generate markdown report only. JSON is for CI/CD integration, not human consumption.
+
+When user requests JSON, create a JSON file:
 
 ```bash
 # Generate JSON filename
@@ -242,10 +245,10 @@ Follow the complete schema defined in [SCHEMA.md](SCHEMA.md).
 
 **Important:** Generate **compact JSON** (no pretty-printing) to minimize file size for CI/CD systems and reduce token usage when parsed.
 
-#### 5.2 Generation Workflow
+#### 5.2 Generation Workflow (When Requested)
 
 ```bash
-# After completing analysis and generating markdown report
+# Only execute when user explicitly requests JSON
 
 # 1. Collect metadata
 REPORT_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
@@ -287,6 +290,7 @@ echo "📊 JSON output: ${JSON_FILE}"
 - **Provide alternatives and examples**
 - **Acknowledge good practices**
 - **Prioritize by severity**
+- **Act as reviewer, not teacher**: Identify problems, link to docs, let developer solve
 
 ### Be Specific
 
@@ -387,9 +391,7 @@ After completing the review:
 
 ```
 ✅ Code review complete!
-📄 Markdown report: CODE-REVIEW-REPORT-2025-01-13.md
-📊 JSON output: CODE-REVIEW-REPORT-2025-01-13.json
-✓ JSON validation passed
+📄 Report saved to: CODE-REVIEW-REPORT-2025-11-14-[commit-hash].md
 
 📊 Summary:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -414,6 +416,12 @@ Verdict: [LGTM / Needs Changes / Blocked]
 2. [Issue title] - file.ext:line
 
 📖 Full details in the report file.
+```
+
+**Note**: Add JSON output lines only when user explicitly requests JSON generation:
+```
+📊 JSON output: CODE-REVIEW-REPORT-2025-11-14-[commit-hash].json
+✓ JSON validation passed
 ```
 
 **DO NOT add any of the following to terminal output:**
