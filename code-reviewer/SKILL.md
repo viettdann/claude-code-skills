@@ -176,6 +176,7 @@ Generate a comprehensive markdown report following the complete structure define
 - **Show code examples**: Use ❌ Before / ✅ After format
 - **Provide fixes**: Include step-by-step remediation
 - **Reference docs**: Link to official framework documentation
+- **NO time estimates**: Do not include fix time estimates - this is a review, not a plan
 
 See [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md) for the complete template structure.
 
@@ -382,6 +383,8 @@ After completing the review:
 
 **User Communication Template:**
 
+**IMPORTANT**: DO NOT include time estimates, fix time estimates, and so in the terminal output. These are reviews, not plans. Only provide issue counts and severity levels.
+
 ```
 ✅ Code review complete!
 📄 Markdown report: CODE-REVIEW-REPORT-2025-01-13.md
@@ -412,6 +415,13 @@ Verdict: [LGTM / Needs Changes / Blocked]
 
 📖 Full details in the report file.
 ```
+
+**DO NOT add any of the following to terminal output:**
+- ❌ NO "Estimated Fix Time"
+- ❌ NO "Critical Fixes Time"
+- ❌ NO time/hour estimates
+
+This is a code REVIEW, not a project plan. Focus on identifying issues, not estimating time.
 
 ## Progressive Disclosure
 
