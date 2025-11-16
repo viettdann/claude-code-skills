@@ -266,6 +266,57 @@ No critical security vulnerabilities, data leaks, or breaking changes detected.
 - **False positives filtered**: [count]
 ```
 
+### Step 9: Save Report to File
+
+IMPORTANT: After generating the report, automatically save it to a markdown file using the Write tool.
+
+**Filename format**: `oh-shit-{branch-name}-{YYYY-MM-DD}-{short-hash}.md`
+
+**Steps to create filename:**
+
+1. Get git information using Bash:
+   ```bash
+   # Get current branch name
+   git rev-parse --abbrev-ref HEAD
+
+   # Get current date
+   date +%Y-%m-%d
+
+   # Get short commit hash (7 chars)
+   git rev-parse --short=7 HEAD
+   ```
+
+2. Sanitize branch name for filesystem:
+   - Replace `/` with `-` (e.g., `deploy/dev` → `deploy-dev`)
+   - Replace spaces with `-`
+   - Remove special characters: `*`, `?`, `<`, `>`, `|`, `:`, `\`, `"`
+   - Convert to lowercase
+
+3. Construct filename:
+   ```
+   {sanitized-branch}-{YYYY-MM-DD}-{hash}.md
+   ```
+
+   **Examples**:
+   - `oh-shit-main-2025-11-17-a1b2c3d.md`
+   - `oh-shit-deploy-dev-2025-11-17-abc1234.md`
+   - `oh-shit-feat-payment-2025-11-17-def5678.md`
+
+4. Write report to file using Write tool:
+   - Use absolute path: `{current-working-directory}/{filename}`
+   - Content: The markdown report generated in Step 8
+
+5. Output confirmation:
+   ```
+   Report saved to: {filename}
+   ```
+
+**Edge cases**:
+
+- **Detached HEAD state**: Use commit hash as branch name (e.g., `oh-shit-detached-a1b2c3d-2025-11-17-a1b2c3d.md`)
+- **Long branch names**: Truncate to 50 chars max before adding date/hash
+- **File already exists**: Append timestamp in seconds to ensure uniqueness (e.g., `oh-shit-main-2025-11-17-a1b2c3d-1737123456.md`)
+
 ## Output Requirements
 
 **Always include**:
@@ -335,7 +386,7 @@ See [examples/](examples/) directory for sample reports:
 
 ## Validation Checklist
 
-Before outputting report, verify:
+Before completing the review, verify:
 - [ ] All findings have confidence ≥ 75
 - [ ] All findings are CRITICAL or HIGH severity only
 - [ ] Each finding has file:line reference
@@ -344,6 +395,8 @@ Before outputting report, verify:
 - [ ] Report is concise and fast to read
 - [ ] Template format followed exactly
 - [ ] Deduplication performed
+- [ ] Report saved to file with correct naming format
+- [ ] File path confirmation output to user
 
 ## References
 

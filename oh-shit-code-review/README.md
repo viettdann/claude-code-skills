@@ -57,6 +57,18 @@ Simply ask Claude to review your code changes:
 
 Claude will automatically activate this skill and generate a report.
 
+**Report Output**:
+- Displays findings in Claude Code interface
+- **Auto-saves** to markdown file: `oh-shit-{branch-name}-{YYYY-MM-DD}-{commit-hash}.md`
+- Saved in current working directory
+- **Prefixes** all filenames with `oh-shit-` for easy identification
+- **Ensures** dashed branch names are properly formatted (e.g., `deploy/dev` -> `deploy-dev`)
+
+**Example filenames**:
+- `oh-shit-main-2025-11-17-a1b2c3d.md`
+- `oh-shit-deploy-dev-2025-11-17-abc1234.md`
+- `oh-shit-feat-payment-2025-11-17-def5678.md`
+
 ### Example Workflow
 
 ```bash
@@ -67,6 +79,8 @@ git add .
 # In Claude Code: "Review my staged changes"
 
 # Claude generates report with critical findings
+# Report auto-saved to: oh-shit-feat-payment-2025-11-17-def5678.md
+
 # Fix issues
 # Commit when clean
 git commit -m "fix: address security issues"
@@ -123,7 +137,15 @@ git commit -m "fix: address security issues"
 
 ## Report Format
 
-The skill generates a **concise** markdown report:
+The skill generates a **concise** markdown report that is both displayed in Claude Code and **automatically saved to a file**.
+
+**Report filename**: `oh-shit-{branch-name}-{YYYY-MM-DD}-{commit-hash}.md`
+- Saved in current working directory
+- Branch name sanitized for filesystem (slashes → dashes)
+- Short commit hash (7 characters)
+- Date in ISO format (YYYY-MM-DD)
+
+**Example report content**:
 
 ```markdown
 # Code Review Report
@@ -158,6 +180,7 @@ The skill generates a **concise** markdown report:
 - No fixed code examples
 - No detailed remediation steps
 - Fast detection only - developers handle the fixes
+- Reports archived for team reference and audit trail
 
 ## Configuration
 
@@ -322,6 +345,12 @@ See `examples/` directory for sample reports:
 - Example Reports: [examples/](examples/)
 
 ## Version History
+
+- **v1.1.0** (2025-11-17): Auto-save reports
+  - **NEW**: Automatic markdown report file generation
+  - Filename format: `oh-shit-{branch-name}-{YYYY-MM-DD}-{commit-hash}.md`
+  - Reports saved to current working directory
+  - Edge case handling (detached HEAD, long branch names, file conflicts)
 
 - **v1.0.0** (2025-11-17): Initial release
   - Next.js security scanning
