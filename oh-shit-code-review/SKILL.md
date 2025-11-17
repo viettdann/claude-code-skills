@@ -69,6 +69,21 @@ Parse git diff output to extract:
 - File paths
 - Change type (added, modified, deleted)
 - Language/framework (Next.js vs .NET C#)
+- Line counts (+additions/-deletions) for Files Changed table
+
+**Use git to get file stats**:
+```bash
+# Get file change summary with +/- counts
+git diff --stat <commit-hash>^..<commit-hash>
+
+# Or for staged changes
+git diff --stat --cached
+```
+
+**Collect for Files Changed table**:
+- File path (relative to repo root)
+- Addition/deletion counts (+X/-Y format)
+- Brief status description (e.g., "Added [DisableAuditing] attribute", "Updated OpenIddict config")
 
 **Next.js indicators**:
 - Extensions: `.tsx`, `.ts`, `.jsx`, `.js`
@@ -170,7 +185,10 @@ IMPORTANT: Check git history to avoid false positives and understand intent.
 For each finding, use Bash to check:
 
 ```bash
-# Who wrote this code and when
+# Get commit hash, author, date, and message for the specific line
+git log -1 --pretty=format:"%H|%an|%ad|%s" --date=format:"%Y-%m-%d %H:%M:%S" -- <file>
+
+# Alternative: Who wrote this code and when (if line-specific needed)
 git blame <file> -L <line_start>,<line_end>
 
 # Change history for this file
@@ -178,6 +196,17 @@ git log --oneline -n 5 -- <file>
 
 # Full context of this change
 git diff HEAD~1..HEAD -- <file>
+```
+
+**Extract for report**:
+- Commit hash (short form: first 7 chars)
+- Commit message (full message)
+- Author name
+- Commit date
+
+**Format in report**:
+```
+Git Context: Commit a6aff26 "feat: add auditing control to patient DTOs" (Tai Tran, 2025-11-17 09:46:01)
 ```
 
 **Use history to**:
@@ -222,31 +251,60 @@ Use the strict markdown template below. **Do not deviate from this format**.
 - **Result**: CRITICAL_ISSUES_FOUND | NO_CRITICAL_ISSUES
 - **Files Scanned**: [count]
 - **Critical Issues**: [count]
+- **High Issues**: [count]
 
 ## Critical Issues
 
 ### [ISSUE_TYPE]
 - **File**: `path/to/file.ext:line_number`
-- **Severity**: CRITICAL | HIGH
+- **Severity**: CRITICAL
 - **Confidence**: [0-100]
-- **Problem**: [1-2 sentence - what's wrong]
-- **Why Critical**: [1-3 sentence - immediate risk]
+- **Problem**: [1-2 sentences describing what was found and the specific code pattern]
+- **Why Critical**: [2-4 sentences explaining business impact, compliance violations, security risks, or production consequences. Include specific regulations (HIPAA, GDPR) or security standards (OWASP) if applicable. Focus on stakeholder understanding without being preachy.]
 - **Code Snippet**:
 
 ```[language]
-[relevant code snippet - 8 lines max]
+// [Brief context comment if needed]
+[5-15 lines showing the issue with minimal surrounding context]
+// [Additional context if helpful]
 ```
-- **Git Context**: [who/when/why from git blame/log]
+- **Git Context**: Commit [hash] "[commit message]" ([Author Name], [date])
 
 ---
 
-[Repeat for each issue]
+[Repeat for each critical issue]
+
+## High Issues
+
+### [ISSUE_TYPE]
+- **File**: `path/to/file.ext:line_number`
+- **Severity**: HIGH
+- **Confidence**: [0-100]
+- **Problem**: [1-2 sentences describing what was found]
+- **Why Critical**: [2-4 sentences explaining the risk without remediation advice]
+- **Code Snippet**:
+
+```[language]
+[5-15 lines with context]
+```
+- **Git Context**: Commit [hash] "[commit message]" ([Author Name], [date])
+
+---
+
+[Repeat for each high issue]
+
+## Files Changed
+
+| File | Changes | Status |
+|------|---------|--------|
+| `path/to/file1.ext` | +X/-Y | [Brief description of change] |
+| `path/to/file2.ext` | +X/-Y | [Brief description of change] |
 
 ## Scan Coverage
 - **Next.js files reviewed**: [count]
 - **.NET C# files reviewed**: [count]
 - **Total changed lines**: [count]
-- **False positives filtered**: [count]
+- **False positives filtered**: [count] ([brief reason if >0])
 ```
 
 **If NO_CRITICAL_ISSUES:**
@@ -258,6 +316,12 @@ Use the strict markdown template below. **Do not deviate from this format**.
 - **Files Scanned**: [count]
 
 No critical security vulnerabilities, data leaks, or breaking changes detected.
+
+## Files Changed
+
+| File | Changes | Status |
+|------|---------|--------|
+| `path/to/file.ext` | +X/-Y | [Brief description] |
 
 ## Scan Coverage
 - **Next.js files reviewed**: [count]
@@ -322,9 +386,11 @@ IMPORTANT: After generating the report, automatically save it to a markdown file
 **Always include**:
 1. Exact file paths with line numbers
 2. Confidence score for each finding
-3. Brief problem statement (1-2 sentence)
-4. Why it's critical (1-3 sentence)
-5. Minimal code snippet (8 lines max)
+3. Brief problem statement (2-3 sentences with specific code pattern)
+4. Why it's critical (2-5 sentences with business/compliance/security impact for stakeholder understanding)
+5. Code snippet with context (5-15 lines showing the issue with minimal surrounding context)
+6. Complete git context (commit hash, commit message, author name, date)
+7. Files Changed table with +/- counts and brief status descriptions
 
 **Never include**:
 - Fixed code examples or detailed remediation steps
@@ -371,17 +437,20 @@ See [examples/](examples/) directory for sample reports:
 ## Anti-Patterns to Avoid
 
 ❌ **Don't do this**:
-- Provide fixed code examples
-- Give detailed remediation steps
-- Act as advisor with "you should..." guidance
+- Provide fixed code examples or "before/after" comparisons
+- Give detailed remediation steps or "how to fix" instructions
+- Act as advisor with "you should..." or "consider..." guidance
 - Report style issues or minor problems
-- Write long explanations
+- Write long explanations or educational content
+- Add "Remediation Required" or "Recommendations" sections with advice
 
 ✅ **Do this**:
 - Identify the critical issue quickly
-- State the problem in 1-2 sentence
-- State why it's critical in 1-3 sentence
-- Show minimal code snippet (8 lines max)
+- State the problem in 2-3 sentences with specific code pattern
+- State why it's critical in 2-5 sentences with business/compliance/security impact
+- Show code snippet with context (5-15 lines)
+- Include complete git context (hash, message, author, date)
+- Include Files Changed table
 - Let developers handle the fix
 
 ## Validation Checklist
@@ -390,6 +459,10 @@ Before completing the review, verify:
 - [ ] All findings have confidence ≥ 75
 - [ ] All findings are CRITICAL or HIGH severity only
 - [ ] Each finding has file:line reference
+- [ ] "Why Critical" has 2-4 sentences with business/compliance/security impact
+- [ ] Code snippets show 5-15 lines with surrounding context
+- [ ] Git Context includes: commit hash, commit message, author name, and date
+- [ ] Files Changed table is included with +/- counts
 - [ ] No fixed code examples included
 - [ ] No detailed remediation steps
 - [ ] Report is concise and fast to read

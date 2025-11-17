@@ -154,6 +154,7 @@ The skill generates a **concise** markdown report that is both displayed in Clau
 - **Result**: CRITICAL_ISSUES_FOUND | NO_CRITICAL_ISSUES
 - **Files Scanned**: 15
 - **Critical Issues**: 2
+- **High Issues**: 1
 
 ## Critical Issues
 
@@ -161,24 +162,56 @@ The skill generates a **concise** markdown report that is both displayed in Clau
 - **File**: `app/components/Analytics.tsx:23`
 - **Severity**: CRITICAL
 - **Confidence**: 100
-- **Problem**: API key hardcoded in client component
-- **Code Snippet**: [relevant code]
-- **Why Critical**: Secret exposed in browser, attackers can extract and abuse
-- **Git Context**: Added by john@example.com on 2025-01-15
+- **Problem**: Google Analytics API key hardcoded directly in client-side React component.
+  Key is visible in production JavaScript bundle.
+- **Why Critical**: Secret exposed in browser bundle allows attackers to extract the API key
+  and abuse the quota, impersonate the application, or access analytics data. This violates
+  security best practices for client-side code and can lead to unauthorized API usage charges.
+- **Code Snippet**:
+```typescript
+'use client';
+export default function Analytics() {
+  const GA_KEY = 'AIzaSyD-9tN3xF2qW4kP7sL8mR1vC3bH9jK0eX2';
+  // ... analytics initialization
+}
+```
+- **Git Context**: Commit a3f89d2 "Add analytics tracking" (John Smith, 2025-11-15 14:23:00)
 
 ---
 
-[Additional issues...]
+## High Issues
+
+### Missing Authorization on Admin Endpoint
+- **File**: `app/api/admin/users/route.ts:12`
+- **Severity**: HIGH
+- **Confidence**: 85
+- **Problem**: Admin user management endpoint lacks authentication middleware.
+- **Why Critical**: Unauthenticated access to user administration could allow privilege
+  escalation or unauthorized account modifications.
+- **Code Snippet**: [code snippet]
+- **Git Context**: Commit b7c12e4 "Add user admin API" (Jane Doe, 2025-11-15)
+
+---
+
+## Files Changed
+
+| File | Changes | Status |
+|------|---------|--------|
+| `app/components/Analytics.tsx` | +12/-3 | Added GA_KEY constant with hardcoded key |
+| `app/api/admin/users/route.ts` | +45 | New admin endpoint without auth |
+| `lib/utils/format.ts` | +8/-2 | Updated date formatting |
 
 ## Scan Coverage
 - **Next.js files reviewed**: 8
 - **.NET C# files reviewed**: 7
 - **Total changed lines**: 342
+- **False positives filtered**: 2
 ```
 
 **Key principles**:
-- No fixed code examples
-- No detailed remediation steps
+- No fixed code examples or "before/after" comparisons
+- No detailed remediation steps or "how to fix" instructions
+- No "Recommendations" or "Immediate Actions Required" sections
 - Fast detection only - developers handle the fixes
 - Reports archived for team reference and audit trail
 
