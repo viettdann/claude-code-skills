@@ -59,15 +59,13 @@ Claude will automatically activate this skill and generate a report.
 
 **Report Output**:
 - Displays findings in Claude Code interface
-- **Auto-saves** to markdown file: `oh-shit-{branch-name}-{YYYY-MM-DD}-{commit-hash}.md`
-- Saved in current working directory
-- **Prefixes** all filenames with `oh-shit-` for easy identification
-- **Ensures** dashed branch names are properly formatted (e.g., `deploy/dev` -> `deploy-dev`)
+- **Auto-saves** to markdown file: `reports/oh-shit-code-report-{YYYY-MM-DD}.md`
+- Saved in `reports/` directory relative to current working directory
+- **Handles duplicates**: If file exists, appends Unix timestamp for uniqueness
 
 **Example filenames**:
-- `oh-shit-main-2025-11-17-a1b2c3d.md`
-- `oh-shit-deploy-dev-2025-11-17-abc1234.md`
-- `oh-shit-feat-payment-2025-11-17-def5678.md`
+- `reports/oh-shit-code-report-2025-11-23.md`
+- `reports/oh-shit-code-report-2025-11-23-1737639156.md` (duplicate on same day)
 
 ### Example Workflow
 
@@ -79,7 +77,7 @@ git add .
 # In Claude Code: "Review my staged changes"
 
 # Claude generates report with critical findings
-# Report auto-saved to: oh-shit-feat-payment-2025-11-17-def5678.md
+# Report auto-saved to: reports/oh-shit-code-report-2025-11-23.md
 
 # Fix issues
 # Commit when clean
@@ -139,11 +137,10 @@ git commit -m "fix: address security issues"
 
 The skill generates a **concise** markdown report that is both displayed in Claude Code and **automatically saved to a file**.
 
-**Report filename**: `oh-shit-{branch-name}-{YYYY-MM-DD}-{commit-hash}.md`
-- Saved in current working directory
-- Branch name sanitized for filesystem (slashes → dashes)
-- Short commit hash (7 characters)
+**Report filename**: `reports/oh-shit-code-report-{YYYY-MM-DD}.md`
+- Saved in `reports/` directory
 - Date in ISO format (YYYY-MM-DD)
+- Timestamp suffix added if duplicate file exists (e.g., `-1737639156.md`)
 
 **Example report content**:
 
@@ -175,7 +172,7 @@ export default function Analytics() {
   // ... analytics initialization
 }
 ```
-- **Git Context**: Commit a3f89d2 "Add analytics tracking" (John Smith, 2025-11-15 14:23:00)
+- **Git Context**: Commit a3f89d2 "Add analytics tracking" (John Smith, 2025-11-23)
 
 ---
 
@@ -189,7 +186,7 @@ export default function Analytics() {
 - **Why Critical**: Unauthenticated access to user administration could allow privilege
   escalation or unauthorized account modifications.
 - **Code Snippet**: [code snippet]
-- **Git Context**: Commit b7c12e4 "Add user admin API" (Jane Doe, 2025-11-15)
+- **Git Context**: Commit b7c12e4 "Add user admin API" (Jane Doe, 2025-11-23)
 
 ---
 
@@ -379,9 +376,15 @@ See `examples/` directory for sample reports:
 
 ## Version History
 
+- **v1.2.0** (2025-11-23): Simplified filename format
+  - **IMPROVED**: Cleaner filename format: `reports/oh-shit-code-report-{YYYY-MM-DD}.md`
+  - Removed branch and commit hash from filename
+  - Reports saved to `reports/` directory
+  - Timestamp-based deduplication for multiple reports per day
+  - File permission set to 644 for readability
+
 - **v1.1.0** (2025-11-17): Auto-save reports
   - **NEW**: Automatic markdown report file generation
-  - Filename format: `oh-shit-{branch-name}-{YYYY-MM-DD}-{commit-hash}.md`
   - Reports saved to current working directory
   - Edge case handling (detached HEAD, long branch names, file conflicts)
 

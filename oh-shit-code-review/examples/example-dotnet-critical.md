@@ -23,7 +23,7 @@ public async Task<List<BookDto>> SearchBooksAsync(string searchTerm)
     return ObjectMapper.Map<List<Book>, List<BookDto>>(books);
 }
 ```
-- **Git Context**: Commit abc123f "Implement book search functionality" (Backend Dev, 2025-11-15 10:23:45)
+- **Git Context**: Commit abc123f "Implement book search functionality" (Backend Dev, 2025-11-23)
 
 ---
 
@@ -50,7 +50,7 @@ public class Order : AggregateRoot<Guid>
     public decimal TotalAmount { get; set; }
 }
 ```
-- **Git Context**: Commit def456g "Refactor Order entity for simplification" (Senior Dev, 2025-11-16 14:12:30)
+- **Git Context**: Commit def456g "Refactor Order entity for simplification" (Senior Dev, 2025-11-23)
 
 ---
 
@@ -68,7 +68,7 @@ public class Order : AggregateRoot<Guid>
   }
 }
 ```
-- **Git Context**: Commit ghi789h "Add production config for deployment testing" (DevOps Engineer, 2025-11-13 09:45:12)
+- **Git Context**: Commit ghi789h "Add production config for deployment testing" (DevOps Engineer, 2025-11-23)
 
 ---
 
@@ -91,7 +91,7 @@ public async Task<PaymentResultDto> ProcessPaymentAsync(PaymentRequestDto reques
     return result;
 }
 ```
-- **Git Context**: Commit jkl012m "Temporarily remove auth for payment testing" (External Contractor, 2025-11-14 16:30:22)
+- **Git Context**: Commit jkl012m "Temporarily remove auth for payment testing" (External Contractor, 2025-11-23)
 
 ---
 

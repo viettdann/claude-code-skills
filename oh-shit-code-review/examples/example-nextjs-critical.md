@@ -31,7 +31,7 @@ export default function PaymentForm() {
   };
 }
 ```
-- **Git Context**: Commit abc123f "Add payment processing to checkout flow" (Frontend Dev, 2025-11-15 14:23:18)
+- **Git Context**: Commit abc123f "Add payment processing to checkout flow" (Frontend Dev, 2025-11-23)
 
 ---
 
@@ -63,7 +63,7 @@ export default function UserProfile({ userId }: { userId: string }) {
   }, [userId]);
 }
 ```
-- **Git Context**: Commit def456g "Add user profile component with direct DB access" (Junior Dev, 2025-11-16 09:12:45)
+- **Git Context**: Commit def456g "Add user profile component with direct DB access" (Junior Dev, 2025-11-23)
 
 ---
 
@@ -97,7 +97,7 @@ module.exports = {
   },
 };
 ```
-- **Git Context**: Commit ghi789h "Temporarily disable CSP for third-party widget testing" (Admin, 2025-11-14 11:45:30)
+- **Git Context**: Commit ghi789h "Temporarily disable CSP for third-party widget testing" (Admin, 2025-11-23)
 
 ---
 
