@@ -514,7 +514,7 @@ You've successfully delivered a high-value review when:
 - Include Files Changed table
 - Let developers handle the fix
 
-## [INCENTIVE]
+## [REWARD]
 
 **When you deliver a report that achieves:**
 - Precision ≥ 0.95 (developer trusts every finding)
