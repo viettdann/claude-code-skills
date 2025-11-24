@@ -239,71 +239,18 @@ echo "Overall Grade: A-"
 echo "Recommendation: [Verdict]"
 ```
 
-### 5. Generate JSON Output (Optional)
+### 5. JSON Export (STRICTLY OPTIONAL - User Must Request)
 
-**IMPORTANT**: Generate JSON output **ONLY when user explicitly requests it** (e.g., "generate JSON report", "I need JSON output", "export as JSON").
+**🚫 DEFAULT: Generate markdown report ONLY. NO JSON unless explicitly requested.**
 
-**By default:** Generate markdown report only. JSON is for CI/CD integration, not human consumption.
+**DO NOT generate JSON unless:**
+1. User explicitly typed: "generate JSON", "create JSON report", "export as JSON", etc.
+2. User mentioned CI/CD integration or automation needs
+3. User confirmed when asked
 
-When user requests JSON, create a JSON file:
+**See [JSON-EXPORT.md](JSON-EXPORT.md) for complete enforcement rules and generation workflow.**
 
-```bash
-# Generate JSON filename
-JSON_FILE="${REPORT_FILE%.md}.json"
-
-# Example: CODE-REVIEW-REPORT-2025-01-13.json (general)
-# Example: CODE-REVIEW-REPORT-2025-01-13-abc1234.json (commit)
-```
-
-#### 5.1 JSON Structure
-
-Follow the complete schema defined in [SCHEMA.md](SCHEMA.md).
-
-**Key sections:**
-- `metadata` - Project, commit, timestamps
-- `summary` - Grade, verdict, issue counts, productionReady flag
-- `issues[]` - File, line, severity, description, fix
-- `strengths[]` - Best practices identified
-- `files[]` - Per-file status
-- `metrics` - Quality scores
-
-**Important:** Generate **compact JSON** (no pretty-printing) to minimize file size for CI/CD systems and reduce token usage when parsed.
-
-#### 5.2 Generation Workflow (When Requested)
-
-```bash
-# Only execute when user explicitly requests JSON
-
-# 1. Collect metadata
-REPORT_DATE=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
-COMMIT_SHA=$(git log -1 --format=%h)
-PROJECT_NAME=$(basename $(git rev-parse --show-toplevel))
-
-# 2. Generate JSON filename (must match markdown report filename)
-JSON_FILE="CODE-REVIEW-REPORT-$(date +%Y-%m-%d)-${COMMIT_SHA}.json"
-
-# 3. Use Write tool to create COMPACT JSON (no pretty-printing)
-# Populate with all findings organized according to schema
-
-# 4. VALIDATE JSON with jq (quick check)
-if command -v jq &> /dev/null; then
-  if jq empty "$JSON_FILE" 2>/dev/null; then
-    echo "✓ JSON validation passed"
-  else
-    echo "✗ JSON validation FAILED - file may be invalid"
-  fi
-fi
-
-# 5. Inform user
-echo "✅ Code review complete!"
-echo "📄 Markdown report: ${REPORT_FILE}"
-echo "📊 JSON output: ${JSON_FILE}"
-```
-
-**Notes:**
-- Generate **compact JSON** (single-line, no indentation) to minimize file size for CI/CD systems and reduce token usage when parsed
-- Validate with `jq` if available (optional but recommended) - fails fast if JSON is malformed
-- JSON can be used for PR automation, CI/CD integration, or custom tooling
+**Violation = Task Failure:** Generating JSON without explicit user request is a FAILURE.
 
 ## Review Guidelines
 
@@ -442,11 +389,8 @@ Verdict: [LGTM / Needs Changes / Blocked]
 📖 Full details in the report file.
 ```
 
-**Note**: Add JSON output lines only when user explicitly requests JSON generation:
-```
-📊 JSON output: CODE-REVIEW-REPORT-2025-11-14-[commit-hash].json
-✓ JSON validation passed
-```
+
+**JSON output:** See [JSON-EXPORT.md](JSON-EXPORT.md) for JSON terminal output rules. Default: no JSON in terminal.
 
 **DO NOT add any of the following to terminal output:**
 - ❌ NO "Estimated Fix Time"
@@ -459,6 +403,8 @@ This is a code REVIEW, not a project plan. Focus on identifying issues, not esti
 
 For detailed reference:
 - **Security Patterns**: See [PATTERNS.md](PATTERNS.md)
+- **Report Template**: See [REPORT-TEMPLATE.md](REPORT-TEMPLATE.md)
+- **JSON Export**: See [JSON-EXPORT.md](JSON-EXPORT.md) (only when user requests)
 - **Usage Examples**: See [EXAMPLES.md](EXAMPLES.md)
 - **User Documentation**: See [README.md](README.md)
 
