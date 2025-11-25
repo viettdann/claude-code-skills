@@ -339,21 +339,52 @@ None detected.
 ### Step 9: Save Report
 
 **Format**: `reports/oh-shit-code-report-{YYYY-MM-DD}.md`
+**Permissions**: **MUST BE** 644 (readable by all users)
+**Execution steps**:
 
-```bash
-date +%Y-%m-%d                                 # Get date
-mkdir -p reports                               # Create dir
+1. Get current date using Bash:
 
-# Check exists, append timestamp if needed
-if [ -f "reports/oh-shit-code-report-$(date +%Y-%m-%d).md" ]; then
-  FILENAME="reports/oh-shit-code-report-$(date +%Y-%m-%d)-$(date +%s).md"
-else
-  FILENAME="reports/oh-shit-code-report-$(date +%Y-%m-%d).md"
-fi
+   ```bash
+   date +%Y-%m-%d
+   ```
 
-# Write with Write tool (absolute path)
-chmod 644 {absolute-path}                      # Set permissions
-```
+2. Create reports directory if it doesn't exist using Bash:
+
+   ```bash
+   mkdir -p reports
+   ```
+
+3. Check if file already exists. If it does, append timestamp in seconds to ensure uniqueness:
+
+   ```bash
+   # Check if base filename exists
+   if [ -f "reports/oh-shit-code-report-$(date +%Y-%m-%d).md" ]; then
+     # File exists, use timestamp
+     FILENAME="reports/oh-shit-code-report-$(date +%Y-%m-%d)-$(date +%s).md"
+   else
+     # File doesn't exist, use base format
+     FILENAME="reports/oh-shit-code-report-$(date +%Y-%m-%d).md"
+   fi
+   ```
+
+   **Examples with timestamp fallback**:
+
+   - First report today: `reports/oh-shit-code-report-2025-11-17.md`
+   - Second report today: `reports/oh-shit-code-report-2025-11-17-1737123456.md`
+   - Third report today: `reports/oh-shit-code-report-2025-11-17-1737127890.md`
+
+4. Write report to file using Write tool with absolute path:
+   - Use absolute path: `{current-working-directory}/reports/{filename}`
+5. Set file permissions to make readable using Bash:
+
+   ```bash
+   chmod 644 {absolute-path-to-report-file}
+   ```
+
+6. Output confirmation:
+   ```
+   Report saved to: {absolute-path-to-report-file}
+   ```
 
 ## [QUALITY CONTROL]
 
